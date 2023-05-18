@@ -1,0 +1,60 @@
+spring:
+
+  main:
+    allow-circular-references: true
+
+  datasource:
+    hikari:
+      jdbc-url: "jdbc:postgresql://localhost:5432/tableplan_project?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC"
+      maximum-pool-size: 20
+      driver-class-name: org.postgresql.Driver
+    username: dev
+    password: dev
+    url: "jdbc:postgresql://localhost:5432/tableplan_project?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC"
+    driver-class-name: org.postgresql.Driver
+
+  thymeleaf:
+    cache: true
+    check-template: true
+    check-template-location: true
+    enabled: true
+    encoding: UTF-8
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-description: Flyway Scripts
+      #    locations: classpath:/db
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+    url: ${spring.datasource.url}
+    default-schema: public
+    out-of-order: true
+    ignore-migration-patterns: '*:ignored'
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
+        format_sql: true
+
+  data:
+    rest:
+      default-page-size: 20
+
+---
+
+
+#---
+#
+#jwtconfig:
+#  secret: secret
+#  expiration: 60000
+#  cookieName: tableplan
+#  expirationMs: 86400000
+#  passwordSalt: 142ddefd-5029-4088-90a8-e7bc78d1e0d6
+#
+#---
+
+
