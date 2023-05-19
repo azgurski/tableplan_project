@@ -45,6 +45,13 @@ spring:
 
 ---
 
+crud_limit_offset:
+  default_find_all_limit: 20
+  default_find_all_offset: 0
+
+---
+
+
 
 #---
 #
