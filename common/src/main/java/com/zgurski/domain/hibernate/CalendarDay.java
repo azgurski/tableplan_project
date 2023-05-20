@@ -1,52 +1,56 @@
-package domain.hibernate;
+package com.zgurski.domain.hibernate;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.Set;
 
 @Data
 @Entity
 @EqualsAndHashCode(exclude = {
-        "restaurant"
+        "restaurant", "timeslots"
 })
 @ToString(exclude = {
-        "restaurant"
+        "restaurant", "timeslots"
 })
-@Table(name = "subscriptions")
+@Table(name = "calendar_days")
 //@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 //@NamedQuery(name = "m_restaurant_multiple_ids_search", query = "select r from Restaurant where r.id = :restaurantIds)
 //@Cacheable
-public class Subscription {
+public class CalendarDay {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "subscription_id")
-    private Long subscriptionId;
+    @Column(name = "calendar_day_id")
+    private Long calendarDayId;
 
-    @Column(name = "days_quantity")
-    private Integer daysQuantity;
+    @Column(name = "local_date")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate localDate;
 
-    @Column(name = "previous_payment_date")
-    private LocalDate previousPaymentDate;
-
-    @Column(name = "next_payment_date")
-    private LocalDate nextPaymentDate;
-
-    @Column(name = "is_paid")
-    private Boolean isPaid;
+    @Column(name = "is_open")
+    private Boolean isOpen;
 
     @Column
     @JsonIgnore
@@ -64,4 +68,13 @@ public class Subscription {
     @JoinColumn(name = "restaurant_id")
     @JsonBackReference
     private Restaurant restaurant;
+
+    @OneToMany(mappedBy = "calendarDay", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JsonManagedReference
+    private Set<Timeslot> timeslots = Collections.emptySet();
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
+    }
 }

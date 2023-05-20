@@ -1,9 +1,9 @@
-package domain.hibernate;
+package com.zgurski.domain.hibernate;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import domain.enums.ReservationStatuses;
+import com.zgurski.domain.enums.ReservationStatuses;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -46,9 +46,11 @@ public class Reservation {
     private String pnr;
 
     @Column(name = "local_date")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
     @Column(name = "local_time")
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime time;
 
     @Column(name = "party_size")

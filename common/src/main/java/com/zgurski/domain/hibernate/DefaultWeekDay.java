@@ -1,56 +1,55 @@
-package domain.hibernate;
+package com.zgurski.domain.hibernate;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.criteria.CriteriaBuilder;
 import java.sql.Timestamp;
-import java.time.LocalDate;
+import java.time.DayOfWeek;
+import java.util.Collections;
+import java.util.Set;
 
 @Data
 @Entity
 @EqualsAndHashCode(exclude = {
-        "calendarDay"
-//        ,"beginTime"
+        "restaurant", "defaultTimes"
 })
 @ToString(exclude = {
-        "calendarDay"
-        //        ,"beginTime"
+        "restaurant", "defaultTimes"
 })
-@Table(name = "timeslots")
+@Table(name = "default_week_days")
 //@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 //@NamedQuery(name = "m_restaurant_multiple_ids_search", query = "select r from Restaurant where r.id = :restaurantIds)
 //@Cacheable
-public class Timeslot {
+public class DefaultWeekDay {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "timeslot_id")
-    private Long timeslotId;
+    @Column(name = "default_week_day_id")
+    private Long defaultWeekDayId;
 
-    @Column(name = "is_available")
-    private Boolean isAvailable;
+    @Column(name = "day_of_week")
+    private DayOfWeek dayOfWeek;
 
-    @Column(name = "current_slot_capacity")
-    private Integer currentSlotCapacity;
-
-    @Column(name = "max_slot_capacity")
-    private Integer maxSlotCapacity;
+    @Column(name = "is_open")
+    private Boolean isOpen;
 
     @Column
-    @JsonFormat(pattern = "HH:mm") //TODO may be yyyy-MM-dd HH:mm:ss
+    @JsonIgnore
     private Timestamp created;
 
     @Column
@@ -62,12 +61,11 @@ public class Timeslot {
     private Boolean isDeleted;
 
     @ManyToOne
-    @JoinColumn(name = "calendar_day_id")
+    @JoinColumn(name = "restaurant_id")
     @JsonBackReference
-    private CalendarDay calendarDay;
+    private Restaurant restaurant;
 
-    @ManyToOne
-    @JoinColumn(name = "begin_time_id")
-    @JsonBackReference
-    private BeginTime beginTime;
+    @ManyToMany(mappedBy = "defaultWeekDays", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonIgnoreProperties("defaultWeekDays")
+    private Set<DefaultTime> defaultTimes = Collections.emptySet();
 }

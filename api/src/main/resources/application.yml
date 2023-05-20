@@ -41,7 +41,7 @@ spring:
 
   data:
     rest:
-      default-page-size: 20
+      default-page-size: 1
 
 ---
 

@@ -1,4 +1,4 @@
-package domain.hibernate;
+package com.zgurski.domain.hibernate;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

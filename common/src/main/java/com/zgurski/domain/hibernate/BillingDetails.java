@@ -1,4 +1,4 @@
-package domain.hibernate;
+package com.zgurski.domain.hibernate;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -33,7 +33,7 @@ public class BillingDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "reservation_id")
+    @Column(name = "billing_data_id")
     private Long billingDataId;
 
     @Column

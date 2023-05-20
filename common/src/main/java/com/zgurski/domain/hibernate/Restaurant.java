@@ -1,4 +1,4 @@
-package domain.hibernate;
+package com.zgurski.domain.hibernate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -27,10 +27,10 @@ import java.util.Set;
 @Data
 @Entity
 @EqualsAndHashCode(exclude = {
-        "reservations", "billing_details", "subscriptions", "default_days", "calendar_days"
+        "reservations", "billingDetails", "subscriptions", "defaultWeekDays", "calendarDays", "roles"
 })
 @ToString(exclude = {
-        "reservations", "billing_details", "subscriptions", "default_days", "calendar_days"
+        "reservations", "billingDetails", "subscriptions", "defaultWeekDays", "calendarDays", "roles"
 })
 @Table(name = "restaurants")
 //@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -43,7 +43,7 @@ public class Restaurant {
     private Long restaurantId;
 
     @Column(name = "restaurant_name")
-    private String name;
+    private String restaurantName;
 
     //@NotEmpty(message = "Email should be not empty.")
     //@Email(message = "Email should be valid.")
@@ -105,7 +105,7 @@ public class Restaurant {
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JsonManagedReference
-    private Set<DefaultDay> defaultDays = Collections.emptySet();
+    private Set<DefaultWeekDay> defaultWeekDays = Collections.emptySet();
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JsonManagedReference
@@ -113,7 +113,7 @@ public class Restaurant {
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JsonManagedReference
-    private Set<BillingDetails> billing_details = Collections.emptySet();
+    private Set<BillingDetails> billingDetails = Collections.emptySet();
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JsonManagedReference
