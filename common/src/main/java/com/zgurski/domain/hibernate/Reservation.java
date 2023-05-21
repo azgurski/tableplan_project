@@ -76,15 +76,14 @@ public class Reservation {
     private ReservationStatuses status = ReservationStatuses.NOT_CONFIRMED;
 
     @Column
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private Timestamp created;
 
     @Column
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private Timestamp changed;
 
     @Column(name = "is_deleted")
-    @JsonIgnore
     private Boolean isDeleted;
 
     @ManyToOne

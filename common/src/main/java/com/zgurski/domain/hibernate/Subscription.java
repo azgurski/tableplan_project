@@ -52,15 +52,14 @@ public class Subscription {
     private Boolean isPaid;
 
     @Column
-    @JsonIgnore
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private Timestamp created;
 
     @Column
-    @JsonIgnore
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private Timestamp changed;
 
     @Column(name = "is_deleted")
-    @JsonIgnore
     private Boolean isDeleted;
 
     @ManyToOne

@@ -1,5 +1,6 @@
 package com.zgurski.domain.hibernate;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
@@ -69,10 +70,10 @@ public class Restaurant {
     private String website;
 
     @Column(name = "restaurant_language")
-    private String language;
+    private String restaurantLanguage;
 
     @Column(name = "restaurant_timezone")
-    private String timezone;
+    private String restaurantTimezone;
 
     @Column(name = "image_url")
     private String imageURL;
@@ -81,15 +82,14 @@ public class Restaurant {
     private String logoURL;
 
     @Column
-    @JsonIgnore
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private Timestamp created;
 
     @Column
-    @JsonIgnore
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private Timestamp changed;
 
     @Column(name = "is_deleted")
-    @JsonIgnore
     private Boolean isDeleted;
 
     @Embedded

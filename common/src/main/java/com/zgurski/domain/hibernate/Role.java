@@ -1,6 +1,7 @@
 package com.zgurski.domain.hibernate;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zgurski.domain.enums.SystemRoles;
 import lombok.Data;
@@ -43,11 +44,11 @@ public class Role {
     private SystemRoles systemRole = SystemRoles.ROLE_USER;
 
     @Column
-    @JsonIgnore
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private Timestamp created;
 
     @Column
-    @JsonIgnore
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private Timestamp changed;
 
     @ManyToOne

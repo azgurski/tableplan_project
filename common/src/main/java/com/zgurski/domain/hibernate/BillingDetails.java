@@ -1,6 +1,7 @@
 package com.zgurski.domain.hibernate;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -53,15 +54,14 @@ public class BillingDetails {
     private String bic;
 
     @Column
-    @JsonIgnore
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private Timestamp created;
 
     @Column
-    @JsonIgnore
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private Timestamp changed;
 
     @Column(name = "is_deleted")
-    @JsonIgnore
     private Boolean isDeleted;
 
     @ManyToOne

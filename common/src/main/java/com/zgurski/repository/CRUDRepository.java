@@ -7,7 +7,7 @@ public interface CRUDRepository<K,T> {
 
     T findById(K id);
 
-    Optional<T> findOne(K id);
+    List<T> findOne(K id);
 
     List<T> findAll();
 
