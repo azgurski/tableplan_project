@@ -29,12 +29,12 @@ public class RestaurantCreateRequest {
 
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "restaurant@gmail.com", type = "string", description = "restaurant email")
     @Email
-    @Size(max = 100)
+    @Size(max = 200)
     @NotNull
     private String contactEmail;
 
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "+375 29 000-00-00", type = "string", description = "restaurant phone")
-    @Size(max = 50)
+    @Size(max = 20)
     private String phone;
 
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "National Str. 10", type = "string", description = "restaurant address")

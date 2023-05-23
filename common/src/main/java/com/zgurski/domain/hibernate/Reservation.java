@@ -47,11 +47,11 @@ public class Reservation {
 
     @Column(name = "local_date")
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate date;
+    private LocalDate localDate;
 
     @Column(name = "local_time")
     @JsonFormat(pattern = "HH:mm")
-    private LocalTime time;
+    private LocalTime localTime;
 
     @Column(name = "party_size")
     private Integer partySize;

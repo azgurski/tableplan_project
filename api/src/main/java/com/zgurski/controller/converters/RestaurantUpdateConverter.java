@@ -5,6 +5,8 @@ import com.zgurski.controller.requests.RestaurantUpdateRequest;
 import com.zgurski.domain.hibernate.Restaurant;
 import com.zgurski.exception.EntityNotFoundException;
 import com.zgurski.repository.RestaurantRepository;
+import com.zgurski.service.RestaurantService;
+import com.zgurski.service.RestaurantServiceImpl;
 import com.zgurski.util.CustomErrorMessageGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -20,21 +22,15 @@ public class RestaurantUpdateConverter extends RestaurantBaseConverter<Restauran
 
     private final RestaurantRepository repository;
 
-    private final CustomErrorMessageGenerator messageGenerator;
+    private final RestaurantService service;
 
     @Override
     public Restaurant convert(RestaurantUpdateRequest request) {
 
+        service.checkIfRestaurantExistsById(request.getRestaurantId());
         Optional<Restaurant> restaurant = repository.findById(request.getRestaurantId());
 
-        if (!restaurant.isPresent()) {
-            throw new EntityNotFoundException(messageGenerator
-                    .createNotFoundByIdMessage(Restaurant.class, request.getRestaurantId().toString()));
-        }
-
-
         restaurant.get().setChanged(Timestamp.valueOf(LocalDateTime.now()));
-
 
         return doConvert(restaurant.get(), request);
     }

@@ -27,5 +27,4 @@ public abstract class RestaurantBaseConverter<S, T> implements Converter<S, T> {
 
         return restaurantForUpdate;
     }
-
 }

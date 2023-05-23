@@ -3,18 +3,24 @@ package com.zgurski.controller.exceptionhandle;
 import com.zgurski.exception.EntityNotFoundException;
 import com.zgurski.exception.FailedTransactionException;
 import com.zgurski.exception.IllegalRequestException;
+import com.zgurski.util.CustomErrorMessageGenerator;
 import com.zgurski.util.RandomValuesGenerator;
 import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
+import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.zgurski.controller.response.ApplicationErrorCodes.BAD_REQUEST_CREATE_ENTITY;
@@ -29,12 +35,49 @@ public class DefaultExceptionHandler {
 
     @ExceptionHandler({
             EmptyResultDataAccessException.class,
-            IllegalArgumentException.class,
-            NumberFormatException.class
+            IllegalArgumentException.class
     })
     public ResponseEntity<Object> handleInvalidInputValueException(Exception ex) {
 
-        ErrorContainer error = buildErrorContainer(ex, 40001, "Invalid input value.");
+        ErrorContainer error = buildErrorContainer(ex, 40001, "Invalid input value(s).");
+        return new ResponseEntity<>(Collections.singletonMap("error", error), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({
+            MethodArgumentTypeMismatchException.class,
+            NumberFormatException.class
+    })
+    public ResponseEntity<Object> handleNumberFormatException(Exception ex) {
+
+        ErrorContainer error = buildErrorContainer(ex, 40002, "Invalid input value(s).");
+        return new ResponseEntity<>(Collections.singletonMap("error", error), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({
+            ConversionFailedException.class
+    })
+    public ResponseEntity<Object> handleConversionException(ConversionFailedException ex) {
+
+        ErrorContainer error = buildErrorContainer(ex, 40001, ex.getCause().getLocalizedMessage().toString());
+        return new ResponseEntity<>(Collections.singletonMap("error", error), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({
+            MethodArgumentNotValidException.class
+    })
+    public ResponseEntity<Object> handleMethodArgumentException(MethodArgumentNotValidException ex) {
+
+            StringBuilder fieldsErrorMessage = new StringBuilder();
+            List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
+
+            for (FieldError fieldError : fieldErrors) {
+
+                fieldsErrorMessage.append(fieldError.getField())
+                        .append(" - ").append(fieldError.getDefaultMessage())
+                        .append("; ");
+            }
+
+        ErrorContainer error = buildErrorContainer(ex, 40001, fieldsErrorMessage.toString());
         return new ResponseEntity<>(Collections.singletonMap("error", error), HttpStatus.BAD_REQUEST);
     }
 
@@ -63,7 +106,7 @@ public class DefaultExceptionHandler {
     @ExceptionHandler(FailedTransactionException.class)
     public ResponseEntity<Object> handleTransactionalException(FailedTransactionException ex) {
 
-        ErrorContainer error = buildErrorContainer(ex, 20401, "Failed to create or update process.");
+        ErrorContainer error = buildErrorContainer(ex, 20401, "Failed to create or update.");
         return new ResponseEntity<>(Collections.singletonMap("error", error), HttpStatus.NO_CONTENT);
     }
     @ExceptionHandler(Exception.class)
