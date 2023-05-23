@@ -20,9 +20,10 @@ public class ReservationCreateConverter extends ReservationBaseConverter<Reserva
     public Reservation convert(ReservationCreateRequest request) {
         Reservation reservation = new Reservation();
 
-        /* System fields filling */
         reservation.setPnr(randomValuesGenerator.generateReservationCode().toUpperCase());
         reservation.setStatus(ReservationStatuses.NOT_CONFIRMED);
+
+        /* System fields filling */
         reservation.setCreated(Timestamp.valueOf(LocalDateTime.now()));
         reservation.setChanged(Timestamp.valueOf(LocalDateTime.now()));
 

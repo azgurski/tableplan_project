@@ -101,7 +101,8 @@ public class RestaurantController {
     public ResponseEntity<Object> deleteSoftRestaurant(
             @PathVariable Long restaurantId) {
 
-        return new ResponseEntity<>(Collections.singletonMap("restaurant",
-                restaurantService.deleteSoft(restaurantId)), HttpStatus.OK);
+        return new ResponseEntity<>(Collections.singletonMap("successMessage",
+                "Restaurant with id={" + restaurantService.deleteSoft(restaurantId) +
+                        "} is deleted."), HttpStatus.OK);
     }
 }

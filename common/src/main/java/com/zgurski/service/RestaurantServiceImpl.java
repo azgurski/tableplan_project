@@ -48,16 +48,26 @@ public class RestaurantServiceImpl implements RestaurantService {
         return restaurantRepository.save(restaurant);
     }
 
-    public Optional<Restaurant> deleteSoft(Long id) {
+    public Long deleteSoft(Long id) {
 
         checkIfRestaurantExistsById(id);
         restaurantRepository.deleteSoft(id);
-        restaurantRepository.updateChangedTime(id);
 
-        return restaurantRepository.findByRestaurantId(id);
+        return id;
     }
 
     /* Verifications, custom exceptions */
+    public Boolean checkIfRestaurantExistsById(Long id) {
+
+        if (restaurantRepository.existsRestaurantByRestaurantId(id)) {
+            return true;
+
+        } else {
+            throw new EntityNotFoundException(messageGenerator
+                    .createNotFoundByIdMessage(Restaurant.class, id.toString()));
+        }
+    }
+
     public List<Restaurant> checkIfRestaurantListNotEmpty(List<Restaurant> allRestaurants) {
 
         if (!allRestaurants.isEmpty() && allRestaurants != null) {
@@ -79,16 +89,4 @@ public class RestaurantServiceImpl implements RestaurantService {
                     .createNotFoundByIdMessage(Page.class, restaurantPage.toString()));
         }
     }
-
-    public Boolean checkIfRestaurantExistsById(Long id) {
-
-        if (restaurantRepository.existsRestaurantByRestaurantId(id)) {
-            return true;
-
-        } else {
-            throw new EntityNotFoundException(messageGenerator
-                    .createNotFoundByIdMessage(Restaurant.class, id.toString()));
-        }
-    }
-
 }

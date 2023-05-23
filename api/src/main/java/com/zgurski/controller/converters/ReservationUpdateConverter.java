@@ -2,6 +2,7 @@ package com.zgurski.controller.converters;
 
 import com.zgurski.controller.requests.ReservationCreateRequest;
 import com.zgurski.controller.requests.ReservationUpdateRequest;
+import com.zgurski.domain.enums.ReservationStatuses;
 import com.zgurski.domain.hibernate.Reservation;
 import com.zgurski.repository.ReservationRepository;
 import com.zgurski.repository.RestaurantRepository;
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class ReservationUpdateConverter extends ReservationBaseConverter<ReservationUpdateRequest, Reservation> {
 
     private final ReservationRepository repository;
+
     private final ReservationService service;
 
     @Override
@@ -27,6 +29,7 @@ public class ReservationUpdateConverter extends ReservationBaseConverter<Reserva
         service.checkIfReservationExistsById(request.getReservationId());
         Optional<Reservation> reservation = repository.findByReservationId(request.getReservationId());
 
+        reservation.get().setStatus(ReservationStatuses.NOT_CONFIRMED);
         reservation.get().setChanged(Timestamp.valueOf(LocalDateTime.now()));
 
         return doConvert(reservation.get(), request);

@@ -18,11 +18,13 @@ public interface ReservationService {
 
     List<Reservation> findReservationsByRestaurantId(Long id);
 
-    Reservation save(Reservation reservation);
+    Reservation save(Long restaurantId, Reservation reservation);
 
-    Reservation update(Reservation reservation);
+    Reservation update(Long restaurantId, Reservation reservation);
 
     Boolean checkIfReservationExistsById(Long id);
 
-    Optional<Reservation> deleteSoft(Long restaurantId, Long reservationId);
+    Boolean checkIfReservationBelongsToRestaurant(Restaurant restaurant, Reservation reservation);
+
+    Long deleteSoft(Long restaurantId, Long reservationId);
 }

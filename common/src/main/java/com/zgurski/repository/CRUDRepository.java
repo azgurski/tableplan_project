@@ -7,7 +7,7 @@ public interface CRUDRepository<K,T> {
 
     T findById(K id);
 
-    List<T> findOne(K id);
+    Optional<T> findOne(K id);
 
     List<T> findAll();
 
@@ -17,5 +17,5 @@ public interface CRUDRepository<K,T> {
 
     T update(T object);
 
-    K delete(K id);
+    Long delete(K id);
 }

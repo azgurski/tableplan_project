@@ -1,5 +1,6 @@
 package com.zgurski.controller.exceptionhandle;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.zgurski.exception.EntityNotFoundException;
 import com.zgurski.exception.FailedTransactionException;
 import com.zgurski.exception.IllegalRequestException;
@@ -11,6 +12,7 @@ import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -45,7 +47,10 @@ public class DefaultExceptionHandler {
 
     @ExceptionHandler({
             MethodArgumentTypeMismatchException.class,
-            NumberFormatException.class
+            NumberFormatException.class,
+            InvalidFormatException.class,
+            IllegalStateException.class,
+            HttpMessageNotReadableException.class
     })
     public ResponseEntity<Object> handleNumberFormatException(Exception ex) {
 

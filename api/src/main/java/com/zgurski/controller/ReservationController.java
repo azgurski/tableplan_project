@@ -44,17 +44,12 @@ import java.util.Optional;
 import java.util.Set;
 
 @RestController
-//@RequestMapping("/reservations")
 @RequiredArgsConstructor
 public class ReservationController {
-
-    private final ReservationRepository reservationRepository;
 
     private final ReservationService reservationService;
 
     private final ConversionService conversionService;
-
-    private final RestaurantService restaurantService;
 
     @Value("${spring.data.rest.default-page-size}")
     private Integer size;
@@ -65,7 +60,7 @@ public class ReservationController {
                 reservationService.findAll()), HttpStatus.OK);
     }
 
-    @GetMapping("/page/{page}")
+    @GetMapping("/reservations/page/{page}")
     public ResponseEntity<Object> findAllReservationsPageable(
             @Parameter(name = "page", example = "1", required = true)
             @PathVariable("page") int page) {
@@ -96,42 +91,34 @@ public class ReservationController {
     public ResponseEntity<Object> saveReservation(
             @Valid @RequestBody ReservationCreateRequest request, @PathVariable Long restaurantId) {
 
-        Restaurant restaurant = restaurantService.findById(restaurantId).get();
-
         Reservation reservation = conversionService.convert(request, Reservation.class);
-        reservation.setRestaurant(restaurant);
+        Reservation savedReservation = reservationService.save(restaurantId, reservation);
 
-        return new ResponseEntity<>(Collections.singletonMap("reservation",
-                reservationService.save(reservation)), HttpStatus.CREATED);
+        return new ResponseEntity<>(Collections.singletonMap("reservation", savedReservation), HttpStatus.CREATED);
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PutMapping("/restaurants/{restaurantId}/reservations")
-    public ResponseEntity<Object> updateRestaurant(@Valid @RequestBody ReservationUpdateRequest request,
+    public ResponseEntity<Object> updateReservation(@Valid @RequestBody ReservationUpdateRequest request,
                                                    @PathVariable Long restaurantId) {
 
-        reservationService.checkIfReservationExistsById(request.getReservationId());
-        Restaurant restaurant = restaurantService.findById(restaurantId).get();
-
         Reservation reservation = conversionService.convert(request, Reservation.class);
-        reservation.setRestaurant(restaurant);
+        Reservation updatedReservation = reservationService.update(restaurantId, reservation);
 
-        return new ResponseEntity<>(Collections.singletonMap("reservation",
-                reservationService.update(reservation)), HttpStatus.CREATED);
+        return new ResponseEntity<>(Collections.singletonMap("reservation", updatedReservation), HttpStatus.CREATED);
     }
-
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @DeleteMapping("/restaurants/{restaurantId}/reservations/{reservationId}")
     public ResponseEntity<Object> deleteSoftReservation(
             @PathVariable Long restaurantId, @PathVariable Long reservationId) {
 
-        return new ResponseEntity<>(Collections.singletonMap("reservation",
-                reservationService.deleteSoft(restaurantId, reservationId)), HttpStatus.OK);
+        return new ResponseEntity<>(Collections.singletonMap("successMessage",
+                "Reservation with id={" + reservationService.deleteSoft(restaurantId, reservationId) +
+                        "} is deleted."), HttpStatus.OK);
     }
 
     //TODO search Criteria query by by ReservationCode, byDate, ByGuestName, ByEmail
     //TODO function summary party size for each day
     //TODO PUT status / guest Detais
-
 }

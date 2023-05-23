@@ -15,7 +15,6 @@ import java.util.Optional;
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long>,
         PagingAndSortingRepository<Restaurant, Long>, CrudRepository<Restaurant, Long> {
 
-
     List<Restaurant> findAll();
 
     Optional<Restaurant> findByRestaurantId(Long restaurantId);
@@ -23,10 +22,6 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long>,
     Boolean existsRestaurantByRestaurantId(Long restaurantId);
 
     @Modifying
-    @Query(value = "update Restaurant r set r.isDeleted = true where r.restaurantId = :restaurantId")
+    @Query(value = "update Restaurant r set r.isDeleted = true, r.changed = NOW() where r.restaurantId = :restaurantId")
     void deleteSoft(Long restaurantId);
-
-    @Modifying
-    @Query(value = "update Restaurant r set r.changed = NOW() where r.restaurantId = :restaurantId")
-    void updateChangedTime(Long restaurantId);
 }

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -43,10 +44,17 @@ public class ReservationServiceImpl implements ReservationService {
 
     public Optional<Reservation> findByReservationIdAndRestaurantId(Long reservationId, Long restaurantId) {
 
-        Restaurant restaurant = restaurantService.findById(restaurantId).get();
-        Optional<Reservation> reservation = reservationRepository.findById(reservationId);
+        restaurantService.checkIfRestaurantExistsById(restaurantId);
 
-        return checkIfReservationBelongsToRestaurant(restaurant, reservation);
+        Optional<Reservation> reservation = reservationRepository
+                .findReservationByReservationIdAndRestaurant_RestaurantId(reservationId, restaurantId);
+
+        if (reservation.isPresent()) {
+            return reservation;
+        } else {
+            throw  new EntityNotFoundException(messageGenerator
+                    .createNotFoundByIdMessage(Reservation.class, reservationId.toString()));
+        }
     }
 
 
@@ -62,35 +70,34 @@ public class ReservationServiceImpl implements ReservationService {
         return allReservations;
     }
 
-    public Reservation save(Reservation reservation) {
-
-        return reservationRepository.save(reservation);
-    }
-
-
-    public Reservation update(Reservation reservation) {
-
-        checkIfReservationExistsById(reservation.getReservationId());
-        return reservationRepository.save(reservation);
-    }
-
-
-    public Optional<Reservation> deleteSoft(Long restaurantId, Long reservationId) {
-
+    public Reservation save(Long restaurantId, Reservation reservation) {
 
         Restaurant restaurant = restaurantService.findById(restaurantId).get();
+        reservation.setRestaurant(restaurant);
 
-        checkIfReservationExistsById(reservationId);
-        Optional<Reservation> reservation = reservationRepository.findById(reservationId);
-
-        checkIfReservationBelongsToRestaurant(restaurant, reservation);
-
-        reservationRepository.deleteSoft(reservationId);
-        reservationRepository.updateChangedTime(reservationId);
-
-        return reservationRepository.findById(reservation.get().getReservationId());
+        return reservationRepository.save(reservation);
     }
 
+
+    public Reservation update(Long restaurantId, Reservation reservation) {
+
+        checkIfReservationExistsById(reservation.getReservationId());
+
+        Restaurant restaurant = restaurantService.findById(restaurantId).get();
+        checkIfReservationBelongsToRestaurant(restaurant, reservation);
+
+        reservation.setRestaurant(restaurant);
+
+        return reservationRepository.save(reservation);
+    }
+
+    public Long deleteSoft(Long restaurantId, Long reservationId) {
+
+        findByReservationIdAndRestaurantId(reservationId, restaurantId);
+        reservationRepository.deleteSoft(reservationId);
+
+        return reservationId;
+    }
 
     /* Verifications, custom exceptions */
     private List<Reservation> checkIfReservationListIsNotEmpty(List<Reservation> allReservations) {
@@ -126,11 +133,18 @@ public class ReservationServiceImpl implements ReservationService {
         }
     }
 
-    public Optional<Reservation> checkIfReservationBelongsToRestaurant(Restaurant restaurant, Optional<Reservation> reservation) {
-        if (restaurant.getReservations().contains(reservation.get())) {
-            return reservation;
 
-        } else throw new EntityNotFoundException(messageGenerator
-                .createNotFoundByIdMessage(Reservation.class, reservation.get().getReservationId().toString()));
+    public Boolean checkIfReservationBelongsToRestaurant(Restaurant restaurant, Reservation reservationToCheck) {
+
+        Optional<Reservation> reservation = reservationRepository
+                .findReservationByReservationIdAndRestaurant_RestaurantId(reservationToCheck.getReservationId(), restaurant.getRestaurantId());
+
+        if (reservation.isPresent()) {
+            return true;
+
+        } else {
+            throw new EntityNotFoundException(messageGenerator
+                    .createNotFoundByIdMessage(Reservation.class, reservationToCheck.getReservationId().toString()));
+        }
     }
 }

@@ -20,7 +20,7 @@ public interface RestaurantService {
 
     Restaurant update(Restaurant restaurant);
 
-    Optional<Restaurant> deleteSoft(Long restaurantId);
+    Long deleteSoft(Long restaurantId);
 
     Boolean checkIfRestaurantExistsById(Long id);
 }
