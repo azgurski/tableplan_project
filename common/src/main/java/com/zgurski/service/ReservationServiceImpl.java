@@ -45,16 +45,10 @@ public class ReservationServiceImpl implements ReservationService {
     public Optional<Reservation> findByReservationIdAndRestaurantId(Long reservationId, Long restaurantId) {
 
         restaurantService.checkIfRestaurantExistsById(restaurantId);
+        checkIfReservationExistsById(reservationId);
+        checkXBelongsToRestaurant(restaurantId, reservationId);
 
-        Optional<Reservation> reservation = reservationRepository
-                .findReservationByReservationIdAndRestaurant_RestaurantId(reservationId, restaurantId);
-
-        if (reservation.isPresent()) {
-            return reservation;
-        } else {
-            throw  new EntityNotFoundException(messageGenerator
-                    .createNotFoundByIdMessage(Reservation.class, reservationId.toString()));
-        }
+        return reservationRepository.findById(reservationId);
     }
 
 
@@ -81,10 +75,11 @@ public class ReservationServiceImpl implements ReservationService {
 
     public Reservation update(Long restaurantId, Reservation reservation) {
 
-        checkIfReservationExistsById(reservation.getReservationId());
-
+        Long reservationId = reservation.getReservationId();
         Restaurant restaurant = restaurantService.findById(restaurantId).get();
-        checkIfReservationBelongsToRestaurant(restaurant, reservation);
+
+        checkIfReservationExistsById(reservationId);
+        checkXBelongsToRestaurant(restaurantId, reservationId);
 
         reservation.setRestaurant(restaurant);
 
@@ -100,6 +95,31 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     /* Verifications, custom exceptions */
+    public Boolean checkXBelongsToRestaurant(Long restaurantId, Long reservationId) {
+
+        Optional<Reservation> reservation = reservationRepository
+                .findReservationByReservationIdAndRestaurant_RestaurantId(reservationId, restaurantId);
+
+        if (reservation.isPresent()) {
+            return true;
+
+        } else {
+            throw new EntityNotFoundException(messageGenerator
+                    .createNotFoundByIdMessage(Reservation.class, reservationId.toString()));
+        }
+    }
+
+    public Boolean checkIfReservationExistsById(Long id) {
+
+        if (reservationRepository.existsReservationByReservationId(id)) {
+            return true;
+
+        } else {
+            throw new EntityNotFoundException(messageGenerator
+                    .createNotFoundByIdMessage(Reservation.class, id.toString()));
+        }
+    }
+
     private List<Reservation> checkIfReservationListIsNotEmpty(List<Reservation> allReservations) {
 
         if (!allReservations.isEmpty() && allReservations != null) {
@@ -119,32 +139,6 @@ public class ReservationServiceImpl implements ReservationService {
         } else {
             throw new EntityNotFoundException(messageGenerator
                     .createNotFoundByIdMessage(Page.class, reservationPage.toString()));
-        }
-    }
-
-    public Boolean checkIfReservationExistsById(Long id) {
-
-        if (reservationRepository.existsReservationByReservationId(id)) {
-            return true;
-
-        } else {
-            throw new EntityNotFoundException(messageGenerator
-                    .createNotFoundByIdMessage(Reservation.class, id.toString()));
-        }
-    }
-
-
-    public Boolean checkIfReservationBelongsToRestaurant(Restaurant restaurant, Reservation reservationToCheck) {
-
-        Optional<Reservation> reservation = reservationRepository
-                .findReservationByReservationIdAndRestaurant_RestaurantId(reservationToCheck.getReservationId(), restaurant.getRestaurantId());
-
-        if (reservation.isPresent()) {
-            return true;
-
-        } else {
-            throw new EntityNotFoundException(messageGenerator
-                    .createNotFoundByIdMessage(Reservation.class, reservationToCheck.getReservationId().toString()));
         }
     }
 }

@@ -24,7 +24,5 @@ public interface ReservationService {
 
     Boolean checkIfReservationExistsById(Long id);
 
-    Boolean checkIfReservationBelongsToRestaurant(Restaurant restaurant, Reservation reservation);
-
     Long deleteSoft(Long restaurantId, Long reservationId);
 }
