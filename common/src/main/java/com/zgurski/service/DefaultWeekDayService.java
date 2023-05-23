@@ -15,12 +15,11 @@ public interface DefaultWeekDayService {
 
     Optional<DefaultWeekDay> findByDefaultWeekDayIdAndRestaurantId(Long defaultWeekDayId, Long restaurantId);
 
-
     List<DefaultWeekDay> findScheduleByRestaurantId(Long id);
 
-    DefaultWeekDay save(DefaultWeekDay defaultWeekDay);
+    DefaultWeekDay save(Long restaurantId, DefaultWeekDay defaultWeekDay);
 
-    DefaultWeekDay update(Long restaurantId, Long weekDayId);
+    DefaultWeekDay update(Long restaurantId, DefaultWeekDay defaultWeekDay);
 
     Boolean checkIfDefaultWeekDayExistsById(Long id);
 

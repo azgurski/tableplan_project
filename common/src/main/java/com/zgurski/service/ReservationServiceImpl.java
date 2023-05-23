@@ -4,31 +4,26 @@ import com.zgurski.domain.hibernate.Reservation;
 import com.zgurski.domain.hibernate.Restaurant;
 import com.zgurski.exception.EntityNotFoundException;
 import com.zgurski.repository.ReservationRepository;
-import com.zgurski.repository.RestaurantRepository;
 import com.zgurski.util.CustomErrorMessageGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class ReservationServiceImpl implements ReservationService {
 
-    private final ReservationRepository reservationRepository;
+    private final RestaurantService restaurantService;
 
-    private final RestaurantRepository restaurantRepository;
+    private final ReservationRepository reservationRepository;
 
     private final CustomErrorMessageGenerator messageGenerator;
 
-    private final RestaurantServiceImpl restaurantService;
+
 
     public List<Reservation> findAll() {
 
@@ -42,16 +37,6 @@ public class ReservationServiceImpl implements ReservationService {
         return checkIfPageReservationIsNotEmpty(reservationPage);
     }
 
-    public Optional<Reservation> findByReservationIdAndRestaurantId(Long reservationId, Long restaurantId) {
-
-        restaurantService.checkIfRestaurantExistsById(restaurantId);
-        checkIfReservationExistsById(reservationId);
-        checkXBelongsToRestaurant(restaurantId, reservationId);
-
-        return reservationRepository.findById(reservationId);
-    }
-
-
     public List<Reservation> findReservationsByRestaurantId(Long restaurantId) {
 
         restaurantService.checkIfRestaurantExistsById(restaurantId);
@@ -64,6 +49,15 @@ public class ReservationServiceImpl implements ReservationService {
         return allReservations;
     }
 
+    public Optional<Reservation> findByReservationIdAndRestaurantId(Long reservationId, Long restaurantId) {
+
+        restaurantService.checkIfRestaurantExistsById(restaurantId);
+        checkIfReservationExistsById(reservationId);
+        checkBelongingReservationToRestaurant(restaurantId, reservationId);
+
+        return reservationRepository.findById(reservationId);
+    }
+
     public Reservation save(Long restaurantId, Reservation reservation) {
 
         Restaurant restaurant = restaurantService.findById(restaurantId).get();
@@ -72,14 +66,13 @@ public class ReservationServiceImpl implements ReservationService {
         return reservationRepository.save(reservation);
     }
 
-
     public Reservation update(Long restaurantId, Reservation reservation) {
 
         Long reservationId = reservation.getReservationId();
         Restaurant restaurant = restaurantService.findById(restaurantId).get();
 
         checkIfReservationExistsById(reservationId);
-        checkXBelongsToRestaurant(restaurantId, reservationId);
+        checkBelongingReservationToRestaurant(restaurantId, reservationId);
 
         reservation.setRestaurant(restaurant);
 
@@ -94,8 +87,9 @@ public class ReservationServiceImpl implements ReservationService {
         return reservationId;
     }
 
+
     /* Verifications, custom exceptions */
-    public Boolean checkXBelongsToRestaurant(Long restaurantId, Long reservationId) {
+    public Boolean checkBelongingReservationToRestaurant(Long restaurantId, Long reservationId) {
 
         Optional<Reservation> reservation = reservationRepository
                 .findReservationByReservationIdAndRestaurant_RestaurantId(reservationId, restaurantId);

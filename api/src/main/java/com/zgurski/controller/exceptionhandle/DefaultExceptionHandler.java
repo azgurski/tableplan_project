@@ -16,6 +16,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -50,7 +51,8 @@ public class DefaultExceptionHandler {
             NumberFormatException.class,
             InvalidFormatException.class,
             IllegalStateException.class,
-            HttpMessageNotReadableException.class
+            HttpMessageNotReadableException.class,
+            HttpRequestMethodNotSupportedException.class
     })
     public ResponseEntity<Object> handleNumberFormatException(Exception ex) {
 
