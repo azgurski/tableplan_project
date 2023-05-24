@@ -1,5 +1,6 @@
 package com.zgurski.repository;
 
+import com.zgurski.domain.enums.ReservationStatuses;
 import com.zgurski.domain.hibernate.Reservation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,6 +19,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
     Optional<Reservation> findReservationByReservationIdAndRestaurant_RestaurantId(Long reservationId, Long restaurantId);
 
     List<Reservation> findReservationsByRestaurant_RestaurantIdOrderByLocalDateAscLocalTimeAsc(Long restaurantId);
+
+    List<Reservation> findReservationsByRestaurant_RestaurantIdAndStatusOrderByLocalDateAscLocalTimeAsc
+            (Long restaurantId, ReservationStatuses status);
+
 
     Boolean existsReservationByReservationId(Long reservationId);
 

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.springframework.cache.annotation.Cacheable;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -35,7 +36,7 @@ import java.util.Set;
 @Table(name = "default_week_days")
 //@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 //@NamedQuery(name = "m_restaurant_multiple_ids_search", query = "select r from Restaurant where r.id = :restaurantIds)
-//@Cacheable
+@Cacheable
 public class DefaultWeekDay {
 
     @Id

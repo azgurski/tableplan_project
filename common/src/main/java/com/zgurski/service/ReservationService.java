@@ -1,5 +1,6 @@
 package com.zgurski.service;
 
+import com.zgurski.domain.enums.ReservationStatuses;
 import com.zgurski.domain.hibernate.Reservation;
 import com.zgurski.domain.hibernate.Restaurant;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,8 @@ public interface ReservationService {
     Optional<Reservation> findByReservationIdAndRestaurantId(Long reservationId, Long restaurantId);
 
     List<Reservation> findReservationsByRestaurantId(Long id);
+
+    List<Reservation> findByStatus(Long restaurantId, ReservationStatuses status);
 
     Reservation save(Long restaurantId, Reservation reservation);
 

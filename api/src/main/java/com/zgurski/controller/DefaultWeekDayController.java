@@ -70,7 +70,15 @@ public class DefaultWeekDayController {
                 weekDayService.findByDefaultWeekDayIdAndRestaurantId(weekDayId, restaurantId)), HttpStatus.OK);
     }
 
-    //TODO findTimesByWeekDay
+    //TODO findTimesByWeekDay criteria
+
+    @GetMapping("/default-times")
+    public ResponseEntity<Object> findAllDefaultTimes() {
+
+        return new ResponseEntity<>(Collections.singletonMap("defaultTimes",
+                weekDayService.findAllDefaultTimes()), HttpStatus.OK);
+    }
+
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PostMapping("/restaurants/{restaurantId}/schedules")

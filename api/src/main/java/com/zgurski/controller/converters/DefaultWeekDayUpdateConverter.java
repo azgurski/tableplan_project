@@ -24,6 +24,8 @@ public class DefaultWeekDayUpdateConverter extends DefaultWeekDayBaseConverter<D
     @Override
     public DefaultWeekDay convert(DefaultWeekDayUpdateRequest request) {
 
+        //       TODO check
+
         service.checkIfDefaultWeekDayExistsById(request.getDefaultWeekDayId());
         Optional<DefaultWeekDay> weekDay = repository.findById(request.getDefaultWeekDayId());
 

@@ -2,6 +2,7 @@ package com.zgurski.service;
 
 import com.zgurski.domain.hibernate.CalendarDay;
 import com.zgurski.domain.hibernate.Restaurant;
+import com.zgurski.domain.hibernate.Timeslot;
 import com.zgurski.exception.EntityNotFoundException;
 import com.zgurski.repository.CalendarDayRepository;
 import com.zgurski.util.CustomErrorMessageGenerator;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +38,7 @@ public class CalendarDayServiceImpl implements CalendarDayService {
         return checkIfPageCalendarDayIsNotEmpty(calendarDayPage);
     }
 
-    public List<CalendarDay> findScheduleByRestaurantId(Long restaurantId) {
+    public List<CalendarDay> findAllByRestaurantId(Long restaurantId) {
 
         restaurantService.checkIfRestaurantExistsById(restaurantId);
 
@@ -48,6 +50,8 @@ public class CalendarDayServiceImpl implements CalendarDayService {
         return allCalendarDays;
     }
 
+
+    //TODO наверное это и не надо, так как открытые данные
     public Optional<CalendarDay> findByCalendarDayIdAndRestaurantId(Long calendarDayId, Long restaurantId) {
 
         restaurantService.checkIfRestaurantExistsById(restaurantId);
@@ -57,7 +61,24 @@ public class CalendarDayServiceImpl implements CalendarDayService {
         return calendarDayRepository.findById(calendarDayId);
     }
 
+    public Optional<CalendarDay> findByDateAndRestaurantId(Long restaurantId, int year, int month, int day) {
+
+        LocalDate localDate = LocalDate.of(year, month, day);
+        restaurantService.checkIfRestaurantExistsById(restaurantId);
+
+        Optional<CalendarDay> calendarDay = calendarDayRepository
+                .findCalendarDayByLocalDateAndRestaurant_RestaurantId(localDate, restaurantId);
+
+        return checkIfAvailabilityExistsByDate(localDate, calendarDay);
+    }
+
     public CalendarDay save(Long restaurantId, CalendarDay calendarDay) {
+
+        if (calendarDayRepository.existsByLocalDateAndRestaurant_RestaurantId(calendarDay.getLocalDate(), restaurantId)) {
+            throw new EntityNotFoundException(messageGenerator
+                    .createNoDuplicatesAllowedByLocalTime(CalendarDay.class, calendarDay.getLocalDate().toString()));
+        }
+
         Restaurant restaurant = restaurantService.findById(restaurantId).get();
         calendarDay.setRestaurant(restaurant);
 
@@ -69,7 +90,7 @@ public class CalendarDayServiceImpl implements CalendarDayService {
         Long calendarDayId = calendarDay.getCalendarDayId();
         Restaurant restaurant = restaurantService.findById(restaurantId).get();
 
-        checkIfCalendarDayExistsById(calendarDayId);
+//        checkIfCalendarDayExistsById(calendarDayId); в Update конвертере повторяется?
         checkBelongingCalendarDayToRestaurant(restaurantId, calendarDayId);
 
         calendarDay.setRestaurant(restaurant);
@@ -78,12 +99,12 @@ public class CalendarDayServiceImpl implements CalendarDayService {
     }
 
 
-    public Long deleteSoft(Long restaurantId, Long reservationId) {
+    public Long deleteSoft(Long restaurantId, Long calendarDayId) {
 
-        findByCalendarDayIdAndRestaurantId(reservationId, restaurantId);
-        calendarDayRepository.deleteSoft(reservationId);
+        findByCalendarDayIdAndRestaurantId(calendarDayId, restaurantId);
+        calendarDayRepository.deleteSoft(calendarDayId);
 
-        return reservationId;
+        return calendarDayId;
     }
 
 
@@ -100,6 +121,15 @@ public class CalendarDayServiceImpl implements CalendarDayService {
         } else {
             throw new EntityNotFoundException(messageGenerator
                     .createNotFoundByIdMessage(CalendarDay.class, calendarDayId.toString()));
+        }
+    }
+
+    private Optional<CalendarDay> checkIfAvailabilityExistsByDate(LocalDate localDate, Optional<CalendarDay> calendarDay) {
+        if (calendarDay.isPresent()) {
+            return calendarDay;
+        } else {
+            throw new EntityNotFoundException(messageGenerator
+                    .createNoEntityFoundByLocalDateMessage(CalendarDay.class, localDate));
         }
     }
 

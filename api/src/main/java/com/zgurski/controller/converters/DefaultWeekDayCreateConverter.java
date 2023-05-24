@@ -16,6 +16,8 @@ public class DefaultWeekDayCreateConverter extends DefaultWeekDayBaseConverter<D
 
     @Override
     public DefaultWeekDay convert(DefaultWeekDayCreateRequest request) {
+        //       TODO check
+
         DefaultWeekDay weekDay = new DefaultWeekDay();
 
         weekDay.setCreated(Timestamp.valueOf(LocalDateTime.now()));

@@ -1,9 +1,11 @@
 package com.zgurski.controller;
 
 import com.zgurski.controller.requests.ReservationCreateRequest;
+import com.zgurski.controller.requests.ReservationSearchCriteria;
 import com.zgurski.controller.requests.ReservationUpdateRequest;
 import com.zgurski.domain.hibernate.Reservation;
 import com.zgurski.exception.FailedTransactionException;
+import com.zgurski.exception.InvalidInputValueException;
 import com.zgurski.service.ReservationService;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +16,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -55,7 +59,7 @@ public class ReservationController {
     public ResponseEntity<Object> findReservationById(@PathVariable Long restaurantId,
                                                       @PathVariable Long reservationId) {
 
-        return new ResponseEntity<>(Collections.singletonMap("reservation",
+        return new ResponseEntity<>(Collections.singletonMap("reservations",
                 reservationService.findByReservationIdAndRestaurantId(reservationId, restaurantId)), HttpStatus.OK);
     }
 
@@ -67,6 +71,18 @@ public class ReservationController {
                         .findReservationsByRestaurantId(restaurantId)), HttpStatus.OK);
     }
 
+    @GetMapping("/restaurants/{restaurantId}/reservations/search")
+    public ResponseEntity<Object> findAllReservationsByStatus(@PathVariable Long restaurantId,
+            @Valid @ModelAttribute ReservationSearchCriteria criteria, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            throw new InvalidInputValueException();
+        }
+
+        return new ResponseEntity<>(Collections.singletonMap("reservations",
+                reservationService
+                        .findByStatus(restaurantId, criteria.getReservationStatus())), HttpStatus.OK);
+    }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PostMapping("/restaurants/{restaurantId}/reservations")

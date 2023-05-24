@@ -1,9 +1,12 @@
 package com.zgurski.service;
 
+import com.zgurski.domain.hibernate.CalendarDay;
+import com.zgurski.domain.hibernate.DefaultTime;
 import com.zgurski.domain.hibernate.DefaultWeekDay;
 import com.zgurski.domain.hibernate.Reservation;
 import com.zgurski.domain.hibernate.Restaurant;
 import com.zgurski.exception.EntityNotFoundException;
+import com.zgurski.repository.DefaultTimeRepository;
 import com.zgurski.repository.DefaultWeekDayRepository;
 import com.zgurski.util.CustomErrorMessageGenerator;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +25,8 @@ public class DefaultWeekDayServiceImpl implements DefaultWeekDayService {
     private final RestaurantService restaurantService;
 
     public final DefaultWeekDayRepository weekDayRepository;
+
+    public final DefaultTimeRepository defaultTimeRepository;
 
     public final CustomErrorMessageGenerator messageGenerator;
 
@@ -49,6 +55,10 @@ public class DefaultWeekDayServiceImpl implements DefaultWeekDayService {
         return allDefaultWeekDays;
     }
 
+    public List<DefaultTime> findAllDefaultTimes() {
+        return defaultTimeRepository.findAllTimes();
+    }
+
     public Optional<DefaultWeekDay> findByDefaultWeekDayIdAndRestaurantId(Long defaultWeekDayId, Long restaurantId) {
 
         restaurantService.checkIfRestaurantExistsById(restaurantId);
@@ -59,6 +69,13 @@ public class DefaultWeekDayServiceImpl implements DefaultWeekDayService {
     }
 
     public DefaultWeekDay save(Long restaurantId, DefaultWeekDay defaultWeekDay) {
+
+        if (weekDayRepository.existsByDayOfWeekAndRestaurant_RestaurantId(defaultWeekDay.getDayOfWeek(), restaurantId)) {
+            throw new EntityNotFoundException(messageGenerator
+                    .createNoDuplicatesAllowedByLocalTime
+                            (DefaultWeekDay.class, defaultWeekDay.getDayOfWeek().toString()));
+        }
+
         Restaurant restaurant = restaurantService.findById(restaurantId).get();
         defaultWeekDay.setRestaurant(restaurant);
 

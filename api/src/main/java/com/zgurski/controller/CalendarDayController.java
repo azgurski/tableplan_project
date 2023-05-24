@@ -52,46 +52,53 @@ public class CalendarDayController {
     }
 
     @GetMapping("/restaurants/{restaurantId}/availability")
-    public ResponseEntity<Object> findScheduleByRestaurantId(@PathVariable Long restaurantId) {
+    public ResponseEntity<Object> findAllAvailabilitiesByRestaurantId(@PathVariable Long restaurantId) {
 
         return new ResponseEntity<>(Collections.singletonMap("calendarDay",
-                calendarDayService.findScheduleByRestaurantId(restaurantId)), HttpStatus.OK);
+                calendarDayService.findAllByRestaurantId(restaurantId)), HttpStatus.OK);
     }
 
-    //TODO @GetMapping("/restaurants/{restaurantId}/availability/{YEAR-MONTH-DAY}")
+    @GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}")
+    public ResponseEntity<Object> findByDateAndRestaurantId
+            (@PathVariable Long restaurantId, @PathVariable int year, @PathVariable int month, @PathVariable int day) {
+
+        return new ResponseEntity<>(Collections.singletonMap("calendarDay",
+                calendarDayService.findByDateAndRestaurantId(restaurantId, year, month, day)), HttpStatus.OK);
+    }
 
 
     //TODO findTimesByWeekDay
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PostMapping("/restaurants/{restaurantId}/availability")
-    public ResponseEntity<Object> saveCalendarDay(
+    public ResponseEntity<Object> saveAvailability(
             @Valid @RequestBody CalendarDayCreateRequest request, @PathVariable Long restaurantId) {
 
         CalendarDay calendarDay = conversionService.convert(request, CalendarDay.class);
-        CalendarDay savedWeekDay = calendarDayService.save(restaurantId, calendarDay);
+        CalendarDay savedCalendarDay = calendarDayService.save(restaurantId, calendarDay);
 
-        return new ResponseEntity<>(Collections.singletonMap("calendarDay", savedWeekDay), HttpStatus.CREATED);
+        return new ResponseEntity<>(Collections.singletonMap("calendarDay", savedCalendarDay), HttpStatus.CREATED);
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PutMapping("/restaurants/{restaurantId}/availability")
-    public ResponseEntity<Object> updateCalendarDay(@Valid @RequestBody CalendarDayUpdateRequest request,
+    public ResponseEntity<Object> updateAvailability(@Valid @RequestBody CalendarDayUpdateRequest request,
                                                     @PathVariable Long restaurantId) {
 
         CalendarDay calendarDay = conversionService.convert(request, CalendarDay.class);
-        CalendarDay updatedWeekDay = calendarDayService.update(restaurantId, calendarDay);
+        CalendarDay updatedCalendarDay = calendarDayService.update(restaurantId, calendarDay);
 
-        return new ResponseEntity<>(Collections.singletonMap("calendarDay", updatedWeekDay), HttpStatus.CREATED);
+        return new ResponseEntity<>(Collections.singletonMap("calendarDay", updatedCalendarDay), HttpStatus.CREATED);
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @DeleteMapping("/restaurants/{restaurantId}/availability/{calendarDayId}")
-    public ResponseEntity<Object> deleteSoftWeekDay(
+    public ResponseEntity<Object> deleteAvailability(
             @PathVariable Long restaurantId, @PathVariable Long calendarDayId) {
 
         return new ResponseEntity<>(Collections.singletonMap("successMessage",
                 "CalendarDay with id={" + calendarDayService.deleteSoft(restaurantId, calendarDayId) +
                         "} is deleted."), HttpStatus.OK);
+
     } //TODO return message with Calendar Date
 }

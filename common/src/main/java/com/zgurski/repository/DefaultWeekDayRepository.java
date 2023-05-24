@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import java.time.DayOfWeek;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +23,10 @@ public interface DefaultWeekDayRepository extends JpaRepository<DefaultWeekDay, 
 
     Boolean existsByDefaultWeekDayId(Long defaultWeekDayId);
 
+    Boolean existsByDayOfWeekAndRestaurant_RestaurantId(DayOfWeek dayOfWeek, Long restaurantId);
+
     @Modifying
-    @Query(value = "update DefaultWeekDay dwd set dwd.isDeleted = true, dwd.changed = NOW() where dwd.defaultWeekDayId = :defaultWeekDayId")
+    @Query(value = "update DefaultWeekDay dwd set dwd.isOpen = false, dwd.isDeleted = true, dwd.changed = NOW() " +
+            "where dwd.defaultWeekDayId = :defaultWeekDayId")
     void deleteSoft(Long defaultWeekDayId);
 }

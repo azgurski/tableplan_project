@@ -8,9 +8,11 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.springframework.cache.annotation.Cacheable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -30,7 +32,7 @@ import java.util.Set;
         "defaultWeekDays"
 })
 @Table(name = "default_times")
-//@Cacheable
+@Cacheable
 public class DefaultTime {
 
     @Id
@@ -47,6 +49,7 @@ public class DefaultTime {
             joinColumns = @JoinColumn(name = "default_time_id"),
             inverseJoinColumns = @JoinColumn(name = "default_week_day_id"))
     @JsonIgnoreProperties("defaultTimes")
+    @JsonIgnore
     private Set<DefaultWeekDay> defaultWeekDays;
 
     @Override

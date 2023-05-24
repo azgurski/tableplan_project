@@ -1,5 +1,6 @@
 package com.zgurski.service;
 
+import com.zgurski.domain.enums.ReservationStatuses;
 import com.zgurski.domain.hibernate.Reservation;
 import com.zgurski.domain.hibernate.Restaurant;
 import com.zgurski.exception.EntityNotFoundException;
@@ -56,6 +57,16 @@ public class ReservationServiceImpl implements ReservationService {
         checkBelongingReservationToRestaurant(restaurantId, reservationId);
 
         return reservationRepository.findById(reservationId);
+    }
+
+    public List<Reservation> findByStatus(Long restaurantId, ReservationStatuses status) {
+
+        restaurantService.checkIfRestaurantExistsById(restaurantId);
+
+        List<Reservation> reservations = reservationRepository
+                .findReservationsByRestaurant_RestaurantIdAndStatusOrderByLocalDateAscLocalTimeAsc(restaurantId, status);
+
+        return checkIfReservationListIsNotEmpty(reservations);
     }
 
     public Reservation save(Long restaurantId, Reservation reservation) {

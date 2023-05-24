@@ -13,15 +13,19 @@ public interface CalendarDayService {
 
     Page<CalendarDay> findAllPageable(Pageable pageable);
 
+    List<CalendarDay> findAllByRestaurantId(Long id);
+
     Optional<CalendarDay> findByCalendarDayIdAndRestaurantId(Long calendarDayId, Long restaurantId);
 
-    List<CalendarDay> findScheduleByRestaurantId(Long id);
+    Optional<CalendarDay> findByDateAndRestaurantId(Long restaurantId, int year, int month, int day);
 
     CalendarDay save(Long restaurantId, CalendarDay calendarDay);
 
     CalendarDay update(Long restaurantId, CalendarDay calendarDay);
 
     Boolean checkIfCalendarDayExistsById(Long id);
+
+    Boolean checkBelongingCalendarDayToRestaurant(Long restaurantId, Long calendarDayId);
 
     Long deleteSoft(Long restaurantId, Long calendarDayId);
 }

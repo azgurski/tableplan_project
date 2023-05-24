@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.zgurski.exception.EntityNotFoundException;
 import com.zgurski.exception.FailedTransactionException;
 import com.zgurski.exception.IllegalRequestException;
+import com.zgurski.exception.InvalidInputValueException;
 import com.zgurski.util.CustomErrorMessageGenerator;
 import com.zgurski.util.RandomValuesGenerator;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.zgurski.controller.response.ApplicationErrorCodes.BAD_REQUEST_CREATE_ENTITY;
-
 @ControllerAdvice
 @RequiredArgsConstructor
 public class DefaultExceptionHandler {
@@ -38,7 +37,8 @@ public class DefaultExceptionHandler {
 
     @ExceptionHandler({
             EmptyResultDataAccessException.class,
-            IllegalArgumentException.class
+            IllegalArgumentException.class,
+            InvalidInputValueException.class
     })
     public ResponseEntity<Object> handleInvalidInputValueException(Exception ex) {
 
@@ -74,15 +74,15 @@ public class DefaultExceptionHandler {
     })
     public ResponseEntity<Object> handleMethodArgumentException(MethodArgumentNotValidException ex) {
 
-            StringBuilder fieldsErrorMessage = new StringBuilder();
-            List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
+        StringBuilder fieldsErrorMessage = new StringBuilder();
+        List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
 
-            for (FieldError fieldError : fieldErrors) {
+        for (FieldError fieldError : fieldErrors) {
 
-                fieldsErrorMessage.append(fieldError.getField())
-                        .append(" - ").append(fieldError.getDefaultMessage())
-                        .append("; ");
-            }
+            fieldsErrorMessage.append(fieldError.getField())
+                    .append(" - ").append(fieldError.getDefaultMessage())
+                    .append("; ");
+        }
 
         ErrorContainer error = buildErrorContainer(ex, 40001, fieldsErrorMessage.toString());
         return new ResponseEntity<>(Collections.singletonMap("error", error), HttpStatus.BAD_REQUEST);
@@ -116,6 +116,7 @@ public class DefaultExceptionHandler {
         ErrorContainer error = buildErrorContainer(ex, 20401, "Failed to create or update.");
         return new ResponseEntity<>(Collections.singletonMap("error", error), HttpStatus.NO_CONTENT);
     }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleException(Exception ex) {
 
@@ -137,46 +138,4 @@ public class DefaultExceptionHandler {
 
         return error;
     }
-
-
-//
-//    @ExceptionHandler(RuntimeException.class)
-//    public ResponseEntity<ErrorMessage> handleRuntimeException(RuntimeException e) {
-//        /* Handles all other exceptions. Status code 500. */
-//
-//        String exceptionUniqueId = generator.uuidGenerator();
-//
-//        log.error(exceptionUniqueId + e.getMessage(), e);
-//
-//        return new ResponseEntity<>(
-//                new ErrorMessage(
-//                        exceptionUniqueId,
-//                        FATAL_ERROR.getCodeId(),
-//                        e.getMessage() + " by Runtime exception handler."
-//                ),
-//                HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
 }
-
-
-//    @ExceptionHandler(IllegalRequestException.class)
-//    public ResponseEntity<ErrorMessage> handleIllegalRequestException(IllegalRequestException e) {
-//
-//        String exceptionUniqueId = generator.uuidGenerator();
-//
-//        BindingResult bindingResult = e.getBindingResult();
-//        String collect = bindingResult.getAllErrors().stream().
-//                map(ObjectError::toString)
-//                .collect(Collectors.joining(", "));
-//
-//        log.error(exceptionUniqueId + e.getMessage(), e);
-//
-//        return new ResponseEntity<>(
-//                new ErrorMessage(
-//                        exceptionUniqueId,
-//                        BAD_REQUEST_CREATE_ENTITY.getCodeId(),
-//                        collect
-////                        e.getMessage() + " by checked exception handler."
-//                ),
-//                HttpStatus.BAD_REQUEST);
-//    }
