@@ -10,6 +10,9 @@ public enum ApplicationErrorCodes {
     INVALID_INPUT_VALUE(40001),
     INVALID_VALUE_WHILE_PARSING(40002),
 
+    /* 403 */
+    INCORRECT_ENTITY_OWNER(40301),
+
     /* 404 */
     ENTITY_NOT_FOUND(40401),
 

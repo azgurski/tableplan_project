@@ -1,6 +1,7 @@
 package com.zgurski.controller.exceptionhandle;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.zgurski.exception.EntityIncorrectOwnerException;
 import com.zgurski.exception.EntityNotFoundException;
 import com.zgurski.exception.FailedTransactionException;
 import com.zgurski.exception.IllegalRequestException;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import javax.validation.ConstraintViolationException;
+import java.time.DateTimeException;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,7 +55,9 @@ public class DefaultExceptionHandler {
             InvalidFormatException.class,
             IllegalStateException.class,
             HttpMessageNotReadableException.class,
-            HttpRequestMethodNotSupportedException.class
+            HttpRequestMethodNotSupportedException.class,
+            DateTimeException.class,
+            ConstraintViolationException.class
     })
     public ResponseEntity<Object> handleNumberFormatException(Exception ex) {
 
@@ -99,6 +104,15 @@ public class DefaultExceptionHandler {
         ErrorContainer error = buildErrorContainer(ex, 40002, collect);
 
         return new ResponseEntity<>(Collections.singletonMap("error", error), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({
+            EntityIncorrectOwnerException.class
+    })
+    public ResponseEntity<Object> handleEntityIncorrectOwnerException(EntityIncorrectOwnerException ex) {
+
+        ErrorContainer error = buildErrorContainer(ex, 40301, ex.getMessage());
+        return new ResponseEntity<>(Collections.singletonMap("error", error), HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler({

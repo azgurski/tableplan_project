@@ -70,7 +70,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     public List<Restaurant> checkIfRestaurantListNotEmpty(List<Restaurant> allRestaurants) {
 
-        if (!allRestaurants.isEmpty() && allRestaurants != null) {
+        if (!allRestaurants.isEmpty()) {
             return allRestaurants;
 
         } else {
@@ -81,7 +81,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     public Page<Restaurant> checkIfPageRestaurantNotEmpty(Page<Restaurant> restaurantPage) {
 
-        if (!restaurantPage.isEmpty() && restaurantPage != null) {
+        if (!restaurantPage.isEmpty()) {
             return restaurantPage;
 
         } else {

@@ -1,5 +1,6 @@
 package com.zgurski.service;
 
+import com.zgurski.domain.hibernate.CalendarDay;
 import com.zgurski.domain.hibernate.Timeslot;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,8 @@ public interface TimeslotService {
 
     List<Timeslot> findAllByCalendarDay(Long restaurantId, int year, int month, int day);
 
+    List<Timeslot> findAllWithinThirtyMinutes(Long restaurantId);
+
     List<Timeslot> findAllByIsAvailable(Long restaurantId, int year, int month, int day, Boolean isAvailable);
 
     Optional<Timeslot> findOneByLocalTime
@@ -26,6 +29,11 @@ public interface TimeslotService {
     Timeslot update(Long restaurantId, int year, int month, int day, Timeslot timeslot);
 
     Boolean checkIfTimeslotExistsById(Long id);
+
+    CalendarDay resetAllTimeslots(Long restaurantId, int year, int month, int day);
+
+
+    CalendarDay setTimeslotsToDefault(Long restaurantId, int year, int month, int day);
 
     Long deleteSoft(Long restaurantId, int year, int month, int day, Long timeslotId);
 }

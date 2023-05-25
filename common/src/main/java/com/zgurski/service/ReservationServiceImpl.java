@@ -1,8 +1,10 @@
 package com.zgurski.service;
 
 import com.zgurski.domain.enums.ReservationStatuses;
+import com.zgurski.domain.hibernate.DefaultWeekDay;
 import com.zgurski.domain.hibernate.Reservation;
 import com.zgurski.domain.hibernate.Restaurant;
+import com.zgurski.exception.EntityIncorrectOwnerException;
 import com.zgurski.exception.EntityNotFoundException;
 import com.zgurski.repository.ReservationRepository;
 import com.zgurski.util.CustomErrorMessageGenerator;
@@ -107,10 +109,9 @@ public class ReservationServiceImpl implements ReservationService {
 
         if (reservation.isPresent()) {
             return true;
-
         } else {
-            throw new EntityNotFoundException(messageGenerator
-                    .createNotFoundByIdMessage(Reservation.class, reservationId.toString()));
+            throw new EntityIncorrectOwnerException(messageGenerator
+                    .createNoCorrectOwnerMessage(Restaurant.class, Reservation.class, reservationId.toString()));
         }
     }
 
@@ -127,7 +128,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     private List<Reservation> checkIfReservationListIsNotEmpty(List<Reservation> allReservations) {
 
-        if (!allReservations.isEmpty() && allReservations != null) {
+        if (!allReservations.isEmpty()) {
             return allReservations;
 
         } else {
@@ -138,7 +139,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     private Page<Reservation> checkIfPageReservationIsNotEmpty(Page<Reservation> reservationPage) {
 
-        if (!reservationPage.isEmpty() && reservationPage != null) {
+        if (!reservationPage.isEmpty()) {
             return reservationPage;
 
         } else {

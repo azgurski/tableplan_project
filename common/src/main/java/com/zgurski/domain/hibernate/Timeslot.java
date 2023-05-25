@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,11 +21,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.sql.Timestamp;
 import java.time.LocalTime;
 
-@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Setter
+@Getter
 @Entity
 @EqualsAndHashCode(exclude = {
         "calendarDay"
@@ -39,9 +45,15 @@ import java.time.LocalTime;
 public class Timeslot {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "timeslotIdGenerator", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "timeslotIdGenerator", sequenceName = "enabled_generated_type_sequence", allocationSize = 1)
     @Column(name = "timeslot_id")
     private Long timeslotId;
+
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @Column(name = "timeslot_id")
+//    private Long timeslotId;
 
     @Column(name = "local_time")
     @JsonFormat(pattern = "HH:mm")
@@ -69,7 +81,7 @@ public class Timeslot {
     @Column(name = "is_deleted")
     private Boolean isDeleted;
 
-    @ManyToOne
+    @ManyToOne(cascade= CascadeType.MERGE)
     @JoinColumn(name = "calendar_day_id")
     @JsonBackReference
     private CalendarDay calendarDay;

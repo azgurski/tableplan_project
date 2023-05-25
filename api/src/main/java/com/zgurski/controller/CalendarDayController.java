@@ -36,14 +36,17 @@ public class CalendarDayController {
     @Value("${spring.data.rest.default-page-size}")
     private Integer size;
 
+    @Value("${crud_limit_offset.default-page-size-by-month}")
+    private Integer monthPageSize;
+
     @GetMapping("/availability")
-    public ResponseEntity<Object> findAllAvailabilitiesForAllRestaurants() {
+    public ResponseEntity<Object> findAllForAllRestaurants() {
         return new ResponseEntity<>(Collections.singletonMap("availabilities",
                 calendarDayService.findAll()), HttpStatus.OK);
     }
 
     @GetMapping("/availability/page/{page}")
-    public ResponseEntity<Object> findAllAvailabilitiesPageable(
+    public ResponseEntity<Object> findAllForAllRestaurantsPageable(
             @Parameter(name = "page", example = "1", required = true)
             @PathVariable("page") int page) {
 
@@ -52,10 +55,18 @@ public class CalendarDayController {
     }
 
     @GetMapping("/restaurants/{restaurantId}/availability")
-    public ResponseEntity<Object> findAllAvailabilitiesByRestaurantId(@PathVariable Long restaurantId) {
+    public ResponseEntity<Object> findAllForNextSixtyDays(@PathVariable Long restaurantId) {
 
         return new ResponseEntity<>(Collections.singletonMap("calendarDay",
-                calendarDayService.findAllByRestaurantId(restaurantId)), HttpStatus.OK);
+                calendarDayService.findAllForNextSixtyDays(restaurantId)), HttpStatus.OK);
+    }
+
+    @GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}")
+    public ResponseEntity<Object> findAllByMonth(
+            @PathVariable Long restaurantId, @PathVariable int year, @PathVariable int month) {
+
+        return new ResponseEntity<>(Collections.singletonMap("calendarDay",
+                calendarDayService.findAllByMonth(restaurantId, year, month)), HttpStatus.OK);
     }
 
     @GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}")

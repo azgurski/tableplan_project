@@ -4,6 +4,7 @@ import com.zgurski.domain.hibernate.CalendarDay;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,7 +14,9 @@ public interface CalendarDayService {
 
     Page<CalendarDay> findAllPageable(Pageable pageable);
 
-    List<CalendarDay> findAllByRestaurantId(Long id);
+    List<CalendarDay> findAllForNextSixtyDays(Long id);
+
+    List<CalendarDay> findAllByMonth(Long restaurantId, int year, int month);
 
     Optional<CalendarDay> findByCalendarDayIdAndRestaurantId(Long calendarDayId, Long restaurantId);
 
@@ -23,9 +26,11 @@ public interface CalendarDayService {
 
     CalendarDay update(Long restaurantId, CalendarDay calendarDay);
 
+    Optional<CalendarDay> checkIfCalendarDayIsPresentByDay(LocalDate localDate, Optional<CalendarDay> calendarDay);
+
     Boolean checkIfCalendarDayExistsById(Long id);
 
-    Boolean checkBelongingCalendarDayToRestaurant(Long restaurantId, Long calendarDayId);
+    Boolean checkBelongingCalendarDayToRestaurant(Long restaurantId, Long calendarDayId, LocalDate localDate);
 
     Long deleteSoft(Long restaurantId, Long calendarDayId);
 }

@@ -1,6 +1,8 @@
 package com.zgurski.repository;
 
+import com.zgurski.domain.hibernate.CalendarDay;
 import com.zgurski.domain.hibernate.DefaultWeekDay;
+import com.zgurski.domain.hibernate.Restaurant;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -18,6 +20,9 @@ public interface DefaultWeekDayRepository extends JpaRepository<DefaultWeekDay, 
 
     Optional<DefaultWeekDay> findDefaultWeekDayByDefaultWeekDayIdAndRestaurant_RestaurantId
             (Long defaultWeekDayId, Long restaurantId);
+
+    Optional<DefaultWeekDay> findDefaultWeekDayByDayOfWeekAndIsOpenAndRestaurant_RestaurantId(
+            DayOfWeek dayOfWeek, Boolean isOpen, Long restaurantId);
 
     List<DefaultWeekDay> findDefaultWeekDaysByRestaurant_RestaurantIdOrderByDayOfWeek(Long restaurantId);
 

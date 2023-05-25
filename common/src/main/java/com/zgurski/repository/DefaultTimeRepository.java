@@ -13,7 +13,7 @@ import java.util.Set;
 public interface DefaultTimeRepository extends JpaRepository<DefaultTime, Long>,
         PagingAndSortingRepository<DefaultTime, Long>, CrudRepository<DefaultTime, Long> {
 
-//    @Cacheable //TODO cacheable над query или сервисом?
+    @Cacheable(value = "All default times") //TODO cacheable над query или сервисом?
     @Query(value = "select dt from DefaultTime dt order by dt.defaultTimeId")
     List<DefaultTime> findAllTimes();
 }

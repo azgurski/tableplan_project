@@ -12,6 +12,11 @@ public class CustomErrorMessageGenerator {
         return clazz.getSimpleName() + " with {id=" + idValue + "} not found.";
     }
 
+    public String createNoCorrectOwnerMessage(Class parentClazz, Class childClazz, String value) {
+        return childClazz.getSimpleName() + " {" + value + "} not found at selected " +
+                parentClazz.getSimpleName() + ".";
+    }
+
     public String createNoEntityFoundMessage(Class clazz) {
         return "No " + clazz.getSimpleName().toString().toLowerCase() + "(s) found.";
     }
@@ -29,7 +34,7 @@ public class CustomErrorMessageGenerator {
         return clazz.getSimpleName() + "={"+ localTime +"} not scheduled on this day.";
     }
 
-    public String createNoDuplicatesAllowedByLocalTime(Class clazz, String value) {
+    public String createNoDuplicatesAllowedByLocalTimeMessage(Class clazz, String value) {
         return clazz.getSimpleName() + " of value {"+ value +"} already exists for this restaurant. " +
                 "Try to update it.";
     }

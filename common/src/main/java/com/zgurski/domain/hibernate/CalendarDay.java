@@ -4,8 +4,14 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -26,7 +32,12 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Set;
 
-@Data
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Setter
+@Getter
 @Entity
 @EqualsAndHashCode(exclude = {
         "restaurant", "timeslots"
@@ -68,7 +79,9 @@ public class CalendarDay {
     @JsonBackReference
     private Restaurant restaurant;
 
-    @OneToMany(mappedBy = "calendarDay", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "calendarDay",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER, orphanRemoval = true)
     @JsonManagedReference
     private Set<Timeslot> timeslots = Collections.emptySet();
 

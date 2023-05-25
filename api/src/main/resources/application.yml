@@ -13,12 +13,12 @@ spring:
     url: "jdbc:postgresql://localhost:5432/tableplan_project?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC"
     driver-class-name: org.postgresql.Driver
 
-  thymeleaf:
-    cache: true
-    check-template: true
-    check-template-location: true
-    enabled: true
-    encoding: UTF-8
+#  thymeleaf:
+#    cache: true
+#    check-template: true
+#    check-template-location: true
+#    enabled: true
+#    encoding: UTF-8
 
   flyway:
     enabled: true
@@ -38,18 +38,34 @@ spring:
       hibernate:
         current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
         format_sql: true
+        jdbc:
+          batch_size: 5
+        generate_statistics: true
 
   data:
     rest:
       default-page-size: 1
+
+
+---
+
+logging:
+  level:
+    org.hibernate:
+      engine.jdbc.batch.internal.BatchingBatch: DEBUG
 
 ---
 
 crud_limit_offset:
   default_find_all_limit: 20
   default_find_all_offset: 0
+  default-page-size-by-month: 30
 
 ---
+
+year.current: 2023
+year.next: 2024
+
 
 
 

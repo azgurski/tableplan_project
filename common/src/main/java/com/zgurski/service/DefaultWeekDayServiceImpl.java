@@ -1,10 +1,10 @@
 package com.zgurski.service;
 
-import com.zgurski.domain.hibernate.CalendarDay;
 import com.zgurski.domain.hibernate.DefaultTime;
 import com.zgurski.domain.hibernate.DefaultWeekDay;
-import com.zgurski.domain.hibernate.Reservation;
 import com.zgurski.domain.hibernate.Restaurant;
+import com.zgurski.domain.hibernate.Timeslot;
+import com.zgurski.exception.EntityIncorrectOwnerException;
 import com.zgurski.exception.EntityNotFoundException;
 import com.zgurski.repository.DefaultTimeRepository;
 import com.zgurski.repository.DefaultWeekDayRepository;
@@ -14,9 +14,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -63,16 +64,34 @@ public class DefaultWeekDayServiceImpl implements DefaultWeekDayService {
 
         restaurantService.checkIfRestaurantExistsById(restaurantId);
         checkIfDefaultWeekDayExistsById(defaultWeekDayId);
-        checkBelongingDefaultWeekDayToRestaurant(restaurantId, defaultWeekDayId);
+
+        DayOfWeek dayOfWeek = weekDayRepository.findById(defaultWeekDayId).get().getDayOfWeek();
+        checkBelongingDefaultWeekDayToRestaurant(restaurantId, defaultWeekDayId, dayOfWeek);
 
         return weekDayRepository.findById(defaultWeekDayId);
+    }
+
+    public Optional<DefaultWeekDay> findDefaultWeekDayByDayOfWeekAndRestaurant_RestaurantId(
+            DayOfWeek dayOfWeek, Long restaurantId) {
+
+        restaurantService.checkIfRestaurantExistsById(restaurantId);
+
+        Optional<DefaultWeekDay> defaultWeekDay = weekDayRepository
+                .findDefaultWeekDayByDayOfWeekAndIsOpenAndRestaurant_RestaurantId(dayOfWeek, true, restaurantId);
+
+        //TODO удалить
+        System.out.println(defaultWeekDay);
+
+        checkIfDefaultDayIsPresent(defaultWeekDay);
+
+        return defaultWeekDay;
     }
 
     public DefaultWeekDay save(Long restaurantId, DefaultWeekDay defaultWeekDay) {
 
         if (weekDayRepository.existsByDayOfWeekAndRestaurant_RestaurantId(defaultWeekDay.getDayOfWeek(), restaurantId)) {
             throw new EntityNotFoundException(messageGenerator
-                    .createNoDuplicatesAllowedByLocalTime
+                    .createNoDuplicatesAllowedByLocalTimeMessage
                             (DefaultWeekDay.class, defaultWeekDay.getDayOfWeek().toString()));
         }
 
@@ -85,10 +104,11 @@ public class DefaultWeekDayServiceImpl implements DefaultWeekDayService {
     public DefaultWeekDay update(Long restaurantId, DefaultWeekDay defaultWeekDay) {
 
         Long defaultWeekDayId = defaultWeekDay.getDefaultWeekDayId();
+        DayOfWeek dayOfWeek = defaultWeekDay.getDayOfWeek();
         Restaurant restaurant = restaurantService.findById(restaurantId).get();
 
         checkIfDefaultWeekDayExistsById(defaultWeekDayId);
-        checkBelongingDefaultWeekDayToRestaurant(restaurantId, defaultWeekDayId);
+        checkBelongingDefaultWeekDayToRestaurant(restaurantId, defaultWeekDayId, dayOfWeek);
 
         defaultWeekDay.setRestaurant(restaurant);
 
@@ -107,7 +127,16 @@ public class DefaultWeekDayServiceImpl implements DefaultWeekDayService {
 
     /* Verifications, custom exceptions */
 
-    public Boolean checkBelongingDefaultWeekDayToRestaurant(Long restaurantId, Long defaultWeekDayId) {
+    private Optional<DefaultWeekDay> checkIfDefaultDayIsPresent(Optional<DefaultWeekDay> defaultWeekDay) {
+        if (defaultWeekDay.isPresent()) {
+            return defaultWeekDay;
+        } else {
+            throw new EntityNotFoundException(messageGenerator
+                    .createNoEntityFoundMessage(DefaultWeekDay.class));
+        }
+    }
+
+    public Boolean checkBelongingDefaultWeekDayToRestaurant(Long restaurantId, Long defaultWeekDayId, DayOfWeek dayOfWeek) {
 
         Optional<DefaultWeekDay> defaultWeekDay = weekDayRepository
                 .findDefaultWeekDayByDefaultWeekDayIdAndRestaurant_RestaurantId(defaultWeekDayId, restaurantId);
@@ -116,8 +145,8 @@ public class DefaultWeekDayServiceImpl implements DefaultWeekDayService {
             return true;
 
         } else {
-            throw new EntityNotFoundException(messageGenerator
-                    .createNotFoundByIdMessage(DefaultWeekDay.class, defaultWeekDayId.toString()));
+            throw new EntityIncorrectOwnerException(messageGenerator
+                    .createNoCorrectOwnerMessage(Restaurant.class, DefaultWeekDay.class, dayOfWeek.toString()));
         }
     }
 
@@ -134,7 +163,7 @@ public class DefaultWeekDayServiceImpl implements DefaultWeekDayService {
 
     private List<DefaultWeekDay> checkIfDefaultWeekDayListIsNotEmpty(List<DefaultWeekDay> allDefaultWeekDays) {
 
-        if (!allDefaultWeekDays.isEmpty() && allDefaultWeekDays != null) {
+        if (!allDefaultWeekDays.isEmpty()) {
             return allDefaultWeekDays;
 
         } else {
@@ -145,7 +174,7 @@ public class DefaultWeekDayServiceImpl implements DefaultWeekDayService {
 
     private Page<DefaultWeekDay> checkIfPageDefaultWeekDayIsNotEmpty(Page<DefaultWeekDay> defaultWeekDayPage) {
 
-        if (!defaultWeekDayPage.isEmpty() && defaultWeekDayPage != null) {
+        if (!defaultWeekDayPage.isEmpty()) {
             return defaultWeekDayPage;
 
         } else {

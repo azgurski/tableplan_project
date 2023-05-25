@@ -2,7 +2,7 @@ package com.zgurski.service;
 
 import com.zgurski.domain.hibernate.CalendarDay;
 import com.zgurski.domain.hibernate.Restaurant;
-import com.zgurski.domain.hibernate.Timeslot;
+import com.zgurski.exception.EntityIncorrectOwnerException;
 import com.zgurski.exception.EntityNotFoundException;
 import com.zgurski.repository.CalendarDayRepository;
 import com.zgurski.util.CustomErrorMessageGenerator;
@@ -38,16 +38,24 @@ public class CalendarDayServiceImpl implements CalendarDayService {
         return checkIfPageCalendarDayIsNotEmpty(calendarDayPage);
     }
 
-    public List<CalendarDay> findAllByRestaurantId(Long restaurantId) {
+    public List<CalendarDay> findAllForNextSixtyDays(Long restaurantId) {
 
         restaurantService.checkIfRestaurantExistsById(restaurantId);
 
         List<CalendarDay> allCalendarDays = calendarDayRepository.
-                findCalendarDaysByRestaurant_RestaurantIdOrderByLocalDate(restaurantId);
+                findAllOpenDaysForNextSixtyDays(restaurantId);
 
         checkIfCalendarDayListIsNotEmpty(allCalendarDays);
 
         return allCalendarDays;
+    }
+
+    public List<CalendarDay> findAllByMonth(Long restaurantId, int year, int month) {
+
+        restaurantService.checkIfRestaurantExistsById(restaurantId);
+        List<CalendarDay> calendarDays = calendarDayRepository.findAllOpenDaysByMonth(restaurantId, year, month);
+
+        return checkIfCalendarDayListIsNotEmpty(calendarDays);
     }
 
 
@@ -56,7 +64,9 @@ public class CalendarDayServiceImpl implements CalendarDayService {
 
         restaurantService.checkIfRestaurantExistsById(restaurantId);
         checkIfCalendarDayExistsById(calendarDayId);
-        checkBelongingCalendarDayToRestaurant(restaurantId, calendarDayId);
+
+        LocalDate localDate = calendarDayRepository.findById(calendarDayId).get().getLocalDate();
+        checkBelongingCalendarDayToRestaurant(restaurantId, calendarDayId, localDate);
 
         return calendarDayRepository.findById(calendarDayId);
     }
@@ -69,14 +79,14 @@ public class CalendarDayServiceImpl implements CalendarDayService {
         Optional<CalendarDay> calendarDay = calendarDayRepository
                 .findCalendarDayByLocalDateAndRestaurant_RestaurantId(localDate, restaurantId);
 
-        return checkIfAvailabilityExistsByDate(localDate, calendarDay);
+        return checkIfCalendarDayIsPresentByDay(localDate, calendarDay);
     }
 
     public CalendarDay save(Long restaurantId, CalendarDay calendarDay) {
 
         if (calendarDayRepository.existsByLocalDateAndRestaurant_RestaurantId(calendarDay.getLocalDate(), restaurantId)) {
             throw new EntityNotFoundException(messageGenerator
-                    .createNoDuplicatesAllowedByLocalTime(CalendarDay.class, calendarDay.getLocalDate().toString()));
+                    .createNoDuplicatesAllowedByLocalTimeMessage(CalendarDay.class, calendarDay.getLocalDate().toString()));
         }
 
         Restaurant restaurant = restaurantService.findById(restaurantId).get();
@@ -88,10 +98,11 @@ public class CalendarDayServiceImpl implements CalendarDayService {
     public CalendarDay update(Long restaurantId, CalendarDay calendarDay) {
 
         Long calendarDayId = calendarDay.getCalendarDayId();
+        LocalDate localDate = calendarDay.getLocalDate();
         Restaurant restaurant = restaurantService.findById(restaurantId).get();
 
 //        checkIfCalendarDayExistsById(calendarDayId); в Update конвертере повторяется?
-        checkBelongingCalendarDayToRestaurant(restaurantId, calendarDayId);
+        checkBelongingCalendarDayToRestaurant(restaurantId, calendarDayId, localDate);
 
         calendarDay.setRestaurant(restaurant);
 
@@ -110,21 +121,29 @@ public class CalendarDayServiceImpl implements CalendarDayService {
 
     /* Verifications, custom exceptions */
 
-    public Boolean checkBelongingCalendarDayToRestaurant(Long restaurantId, Long calendarDayId) {
+    public Boolean checkBelongingCalendarDayToRestaurant(Long restaurantId, Long calendarDayId, LocalDate localDate) {
 
-        Optional<CalendarDay> calendarDay = calendarDayRepository
-                .findCalendarDayByCalendarDayIdAndRestaurant_RestaurantId(calendarDayId, restaurantId);
+//        calendarDayRepository.findCalendarDayByCalendarDayIdAndRestaurant_RestaurantId(calendarDayId, restaurantId);
+
+        Optional<CalendarDay> calendarDay =
+                calendarDayRepository.findCalendarDayByLocalDateAndRestaurant_RestaurantId(localDate, restaurantId);
+
+
+//        Optional<CalendarDay> calendarDay = calendarDayRepository
+//                .findCalendarDayByCalendarDayIdAndRestaurant_RestaurantId(calendarDayId, restaurantId);
+
+        System.out.println(calendarDay);
 
         if (calendarDay.isPresent()) {
             return true;
 
         } else {
-            throw new EntityNotFoundException(messageGenerator
-                    .createNotFoundByIdMessage(CalendarDay.class, calendarDayId.toString()));
+            throw new EntityIncorrectOwnerException(messageGenerator
+                    .createNoCorrectOwnerMessage(Restaurant.class, CalendarDay.class, localDate.toString()));
         }
     }
 
-    private Optional<CalendarDay> checkIfAvailabilityExistsByDate(LocalDate localDate, Optional<CalendarDay> calendarDay) {
+    public Optional<CalendarDay> checkIfCalendarDayIsPresentByDay(LocalDate localDate, Optional<CalendarDay> calendarDay) {
         if (calendarDay.isPresent()) {
             return calendarDay;
         } else {
@@ -146,7 +165,7 @@ public class CalendarDayServiceImpl implements CalendarDayService {
 
     private List<CalendarDay> checkIfCalendarDayListIsNotEmpty(List<CalendarDay> allCalendarDays) {
 
-        if (!allCalendarDays.isEmpty() && allCalendarDays != null) {
+        if (!allCalendarDays.isEmpty()) {
             return allCalendarDays;
 
         } else {
@@ -157,7 +176,7 @@ public class CalendarDayServiceImpl implements CalendarDayService {
 
     private Page<CalendarDay> checkIfPageCalendarDayIsNotEmpty(Page<CalendarDay> calendarDayPage) {
 
-        if (!calendarDayPage.isEmpty() && calendarDayPage != null) {
+        if (!calendarDayPage.isEmpty()) {
             return calendarDayPage;
 
         } else {
