@@ -2,6 +2,7 @@ package com.zgurski.controller.exceptionhandle;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.zgurski.exception.EntityIncorrectOwnerException;
+import com.zgurski.exception.EntityNotAddedException;
 import com.zgurski.exception.EntityNotFoundException;
 import com.zgurski.exception.FailedTransactionException;
 import com.zgurski.exception.IllegalRequestException;
@@ -25,6 +26,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import javax.validation.ConstraintViolationException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.time.DateTimeException;
 import java.util.Collections;
 import java.util.List;
@@ -41,7 +44,9 @@ public class DefaultExceptionHandler {
     @ExceptionHandler({
             EmptyResultDataAccessException.class,
             IllegalArgumentException.class,
-            InvalidInputValueException.class
+            InvalidInputValueException.class,
+            IOException.class,
+            SQLException.class
     })
     public ResponseEntity<Object> handleInvalidInputValueException(Exception ex) {
 
@@ -107,6 +112,15 @@ public class DefaultExceptionHandler {
     }
 
     @ExceptionHandler({
+            EntityNotAddedException.class
+    })
+    public ResponseEntity<Object> handleEntityNotAddedException(EntityNotAddedException ex) {
+
+        ErrorContainer error = buildErrorContainer(ex, 40003, ex.getMessage());
+        return new ResponseEntity<>(Collections.singletonMap("error", error), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler({
             EntityIncorrectOwnerException.class
     })
     public ResponseEntity<Object> handleEntityIncorrectOwnerException(EntityIncorrectOwnerException ex) {
@@ -123,6 +137,8 @@ public class DefaultExceptionHandler {
         ErrorContainer error = buildErrorContainer(ex, 40401, ex.getMessage());
         return new ResponseEntity<>(Collections.singletonMap("error", error), HttpStatus.NOT_FOUND);
     }
+
+
 
     @ExceptionHandler(FailedTransactionException.class)
     public ResponseEntity<Object> handleTransactionalException(FailedTransactionException ex) {

@@ -1,6 +1,7 @@
 package com.zgurski.service;
 
 import com.zgurski.domain.hibernate.CalendarDay;
+import com.zgurski.domain.hibernate.Reservation;
 import com.zgurski.domain.hibernate.Restaurant;
 import com.zgurski.exception.EntityIncorrectOwnerException;
 import com.zgurski.exception.EntityNotFoundException;

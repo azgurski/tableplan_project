@@ -5,6 +5,7 @@ import com.zgurski.domain.hibernate.DefaultTime;
 import com.zgurski.domain.hibernate.DefaultWeekDay;
 import com.zgurski.domain.hibernate.Restaurant;
 import com.zgurski.domain.hibernate.Timeslot;
+import com.zgurski.exception.EntityNotAddedException;
 import com.zgurski.exception.EntityNotFoundException;
 import com.zgurski.repository.CalendarDayRepository;
 import com.zgurski.repository.TimeslotRepository;
@@ -193,97 +194,12 @@ public class TimeslotServiceImpl implements TimeslotService {
         LocalDate localDate = LocalDate.of(year, month, day);
         DayOfWeek dayOfWeek = localDate.getDayOfWeek();
 
-        Optional<CalendarDay> calendarDayOptional = calendarDayRepository
-                .findCalendarDayByLocalDateAndRestaurant_RestaurantId(localDate, restaurantId);
+        resetCalendarDayTimeslots(localDate, restaurant, restaurantId);
 
-        if (!calendarDayOptional.isPresent()) {
-
-            CalendarDay calendarDayToCreate = CalendarDay.builder()
-                    .localDate(localDate)
-                    .isOpen(true)
-                    .created(Timestamp.valueOf(LocalDateTime.now()))
-                    .changed(Timestamp.valueOf(LocalDateTime.now()))
-                    .isDeleted(false)
-                    .restaurant(restaurant)
-                    .build();
-
-            calendarDayRepository.save(calendarDayToCreate);
-
-        } else {
-            calendarDayOptional.get().setIsOpen(true);
-            timeslotRepository.closeAllTimeslots(calendarDayOptional.get());
-            calendarDayRepository.save(calendarDayOptional.get());
-        }
-
-        CalendarDay calendarDay = calendarDayRepository
-                .findCalendarDayByLocalDateAndRestaurant_RestaurantId(localDate, restaurantId).get();
-
-        //Getting Default Schedule//
-        DefaultWeekDay defaultWeekDaySchedule = defaultWeekDayService
-                .findDefaultWeekDayByDayOfWeekAndRestaurant_RestaurantId(dayOfWeek, restaurantId).get();
-
-        //returns if default week day (monday) for this restaurant is open (true)
-
-        //Save CalendarDay and link with Restaurant
-
-
-
-
-        //Set Timeslots from default batch update
-
-        Set<DefaultTime> defaultTimes = defaultWeekDaySchedule.getDefaultTimes();
-
-        List<LocalTime> localTimeList = defaultTimes.stream().map(
-                (value) -> value.getLocalTime()).collect(Collectors.toList());
-
-        for (int index = 0; index < defaultTimes.size(); index++) {
-
-            Timeslot timeslot = Timeslot.builder()
-                    .localTime(localTimeList.get(index))
-                    .isAvailable(true)
-                    .created(Timestamp.valueOf(LocalDateTime.now()))
-                    .changed(Timestamp.valueOf(LocalDateTime.now()))
-                    .isDeleted(false)
-                    .calendarDay(calendarDay)
-                    .build();
-
-            entityManager.persist(timeslot);
-
-            if ((index + 1) % batchSize == 0) {
-                entityManager.flush();
-                entityManager.clear();
-            }
-        }
-
-
-
-        //TODO
-//        List<DefaultTime> defaultTimeList = defaultTimes.stream().toList();
-
-//        for (int defaultTimeValue = 0; defaultTimeValue < defaultTimes.size(); defaultTimeValue++) {
-//
-//            if (defaultTimeValue > 0 && defaultTimeValue % batchSize == 0) {
-//                entityManager.flush();
-//                entityManager.clear();
-//            }
-//
-//            Timeslot timeslot = Timeslot.builder()
-//                    .localTime(defaultTimeList.get(defaultTimeValue).getLocalTime())
-//                    .isAvailable(true)
-//                    .created(Timestamp.valueOf(LocalDateTime.now()))
-//                    .changed(Timestamp.valueOf(LocalDateTime.now()))
-//                    .isDeleted(false)
-//                    .calendarDay(calendarDay)
-//                    .build();
-//
-//            System.out.println("timeslot" + timeslot.toString());
-//
-//            entityManager.persist(timeslot);
-//        }
+        batchUpdateTimeslotsFromDefault(localDate, dayOfWeek, restaurantId);
 
         return calendarDayService.findByDateAndRestaurantId(restaurantId, year, month, day).get();
     }
-
 
     public Long deleteSoft(Long restaurantId, int year, int month, int day, Long timeslotId) {
 
@@ -310,6 +226,68 @@ public class TimeslotServiceImpl implements TimeslotService {
 
         return timeslotId;
     }
+
+    /* Transfer DefaultDay, DefaultTimes -> CalendarDay, Timeslots */
+    private void resetCalendarDayTimeslots(LocalDate localDate, Restaurant restaurant, Long restaurantId) {
+
+        Optional<CalendarDay> calendarDayOptional = calendarDayRepository
+                .findCalendarDayByLocalDateAndRestaurant_RestaurantId(localDate, restaurantId);
+
+        if (!calendarDayOptional.isPresent()) {
+
+            CalendarDay calendarDayToCreate = CalendarDay.builder()
+                    .localDate(localDate)
+                    .isOpen(true)
+                    .created(Timestamp.valueOf(LocalDateTime.now()))
+                    .changed(Timestamp.valueOf(LocalDateTime.now()))
+                    .isDeleted(false)
+                    .restaurant(restaurant)
+                    .build();
+
+            calendarDayRepository.save(calendarDayToCreate);
+
+        } else {
+            calendarDayOptional.get().setIsOpen(true);
+            timeslotRepository.closeAllTimeslots(calendarDayOptional.get());
+            calendarDayRepository.save(calendarDayOptional.get());
+        }
+    }
+
+
+    private void batchUpdateTimeslotsFromDefault(
+            LocalDate localDate, DayOfWeek dayOfWeek, Long restaurantId) {
+
+        CalendarDay calendarDay = calendarDayRepository
+                .findCalendarDayByLocalDateAndRestaurant_RestaurantId(localDate, restaurantId).get();
+
+        DefaultWeekDay defaultWeekDay = defaultWeekDayService
+                .findDefaultWeekDayByDayOfWeekAndRestaurant_RestaurantId(dayOfWeek, restaurantId).get();
+
+        Set<DefaultTime> defaultTimes = defaultWeekDay.getDefaultTimes();
+
+        List<LocalTime> localTimeList = defaultTimes.stream().map(
+                DefaultTime::getLocalTime).toList();
+
+        for (int index = 0; index < defaultTimes.size(); index++) {
+
+            Timeslot timeslot = Timeslot.builder()
+                    .localTime(localTimeList.get(index))
+                    .isAvailable(true)
+                    .created(Timestamp.valueOf(LocalDateTime.now()))
+                    .changed(Timestamp.valueOf(LocalDateTime.now()))
+                    .isDeleted(false)
+                    .calendarDay(calendarDay)
+                    .build();
+
+            entityManager.persist(timeslot);
+
+            if ((index + 1) % batchSize == 0) {
+                entityManager.flush();
+                entityManager.clear();
+            }
+        }
+    }
+
 
 
     /* Verifications, custom exceptions */
@@ -338,19 +316,6 @@ public class TimeslotServiceImpl implements TimeslotService {
         }
     }
 
-//    private Optional<CalendarDay> getCalendarDayIfRestaurantIsOpen(Long restaurantId, int year, int month, int day) {
-//
-//        Optional<CalendarDay> calendarDay = calendarDayService.findByDateAndRestaurantId(restaurantId, year, month, day);
-//
-//        if (calendarDay.get().getIsOpen()) {
-//            return calendarDay;
-//
-//        } else {
-//            throw new EntityNotFoundException(messageGenerator
-//                    .createEntityIsUnavailableMessage(Restaurant.class, calendarDay.get().getLocalDate()));
-//        }
-//    }
-
     private Optional<Timeslot> checkIfTimeslotPresent(LocalTime localTime, Optional<Timeslot> timeslot) {
         if (timeslot.isPresent()) {
             return timeslot;
@@ -378,6 +343,28 @@ public class TimeslotServiceImpl implements TimeslotService {
         } else {
             throw new EntityNotFoundException(messageGenerator
                     .createNotFoundByIdMessage(Page.class, timeslotPage.toString()));
+        }
+    }
+
+    public Boolean checkTimeslotCapacity(int newReservationPartySize, LocalDate localDate, LocalTime localTime, Restaurant restaurant) {
+
+        Optional<Timeslot> timeslot = timeslotRepository
+                .findTimeslotByLocalTimeAndCalendarDay_LocalDateAndCalendarDay_Restaurant(
+                        localTime, localDate, restaurant);
+
+        checkIfTimeslotPresent(localTime, timeslot);
+
+        Integer currentSlotCapacity = timeslot.get().getCurrentSlotCapacity();
+
+        currentSlotCapacity += newReservationPartySize;
+
+        if (currentSlotCapacity <= timeslot.get().getMaxSlotCapacity()) {
+            timeslotRepository.updateCurrentCapacity(currentSlotCapacity, timeslot.get());
+            return true;
+
+        } else {
+            throw new EntityNotAddedException(messageGenerator
+                    .createEntityNotAvailableByTimeMessage(Restaurant.class, localDate, localTime));
         }
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +27,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     private final CustomErrorMessageGenerator messageGenerator;
 
-
+    public final TimeslotService timeslotService;
 
     public List<Reservation> findAll() {
 
@@ -71,10 +72,46 @@ public class ReservationServiceImpl implements ReservationService {
         return checkIfReservationListIsNotEmpty(reservations);
     }
 
+    public List<Reservation> findAllByDateAndRestaurantId(Long restaurantId, int year, int month, int day) {
+
+        Restaurant restaurant = restaurantService.findById(restaurantId).get();
+        LocalDate localDate = LocalDate.of(year, month, day);
+
+        return checkIfReservationListIsNotEmpty(
+                reservationRepository.findAllByDateAndRestaurant(localDate, restaurant));
+    }
+
+    public List<Reservation> findAllByDateStatusAndRestaurantId(
+            Long restaurantId, ReservationStatuses status, int year, int month, int day) {
+
+        Restaurant restaurant = restaurantService.findById(restaurantId).get();
+        LocalDate localDate = LocalDate.of(year, month, day);
+
+        return checkIfReservationListIsNotEmpty(
+                reservationRepository.findAllByDateStatusAndRestaurantId(localDate, status, restaurant));
+    }
+
+    public List<Object> getOccupancyByHour(Long restaurantId, int year, int month, int day) {
+
+        restaurantService.checkIfRestaurantExistsById(restaurantId);
+
+        List<Object> occupancyByHour = reservationRepository.getOccupancyByHour(restaurantId, year, month, day);
+
+        if (occupancyByHour.isEmpty()) {
+            throw new EntityNotFoundException(messageGenerator
+                    .createNoEntityFoundMessage(Reservation.class));
+        }
+
+        return occupancyByHour;
+    }
+
     public Reservation save(Long restaurantId, Reservation reservation) {
 
         Restaurant restaurant = restaurantService.findById(restaurantId).get();
         reservation.setRestaurant(restaurant);
+
+        timeslotService.checkTimeslotCapacity(
+                reservation.getPartySize(), reservation.getLocalDate(), reservation.getLocalTime(), restaurant);
 
         return reservationRepository.save(reservation);
     }
@@ -86,6 +123,9 @@ public class ReservationServiceImpl implements ReservationService {
 
         checkIfReservationExistsById(reservationId);
         checkBelongingReservationToRestaurant(restaurantId, reservationId);
+
+        timeslotService.checkTimeslotCapacity(
+                reservation.getPartySize(), reservation.getLocalDate(), reservation.getLocalTime(), restaurant);
 
         reservation.setRestaurant(restaurant);
 

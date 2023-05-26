@@ -3,6 +3,7 @@ package com.zgurski.controller;
 import com.zgurski.controller.requests.ReservationCreateRequest;
 import com.zgurski.controller.requests.ReservationSearchCriteria;
 import com.zgurski.controller.requests.ReservationUpdateRequest;
+import com.zgurski.domain.enums.ReservationStatuses;
 import com.zgurski.domain.hibernate.Reservation;
 import com.zgurski.exception.FailedTransactionException;
 import com.zgurski.exception.InvalidInputValueException;
@@ -24,9 +25,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.Collections;
 
 @RestController
@@ -72,7 +75,8 @@ public class ReservationController {
     }
 
     @GetMapping("/restaurants/{restaurantId}/reservations/search")
-    public ResponseEntity<Object> findAllReservationsByStatus(@PathVariable Long restaurantId,
+    public ResponseEntity<Object> findAllReservationsByStatus(
+            @PathVariable Long restaurantId,
             @Valid @ModelAttribute ReservationSearchCriteria criteria, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
@@ -83,6 +87,36 @@ public class ReservationController {
                 reservationService
                         .findByStatus(restaurantId, criteria.getReservationStatus())), HttpStatus.OK);
     }
+
+    @GetMapping("/restaurants/{restaurantId}/reservations/{year}/{month}/{day}")
+    public ResponseEntity<Object> findAllReservationsByDate(
+            @PathVariable Long restaurantId,
+            @PathVariable int year, @PathVariable int month, @PathVariable int day) {
+
+        return new ResponseEntity<>(Collections.singletonMap("reservations",
+                reservationService.findAllByDateAndRestaurantId(
+                        restaurantId, year, month, day)), HttpStatus.OK);
+    }
+
+    @GetMapping("/restaurants/{restaurantId}/reservations/{year}/{month}/{day}/search")
+    public ResponseEntity<Object> findAllReservationsByDate(
+            @PathVariable Long restaurantId, @RequestParam ReservationStatuses status,
+            @PathVariable int year, @PathVariable int month, @PathVariable int day) {
+
+        return new ResponseEntity<>(Collections.singletonMap("reservations",
+                reservationService.findAllByDateStatusAndRestaurantId(
+                        restaurantId, status, year, month, day)), HttpStatus.OK);
+    }
+
+    @GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/occupancy")
+    public ResponseEntity<Object> findOccupancyByDate(@PathVariable Long restaurantId,
+                                                      @PathVariable int year, @PathVariable int month, @PathVariable int day) {
+
+        return new ResponseEntity<>(Collections.singletonMap(
+                "Occupancy by hours for calendarDay={" + LocalDate.of(year, month, day) + "}",
+                reservationService.getOccupancyByHour(restaurantId, year, month, day)), HttpStatus.OK);
+    }
+
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PostMapping("/restaurants/{restaurantId}/reservations")
@@ -98,7 +132,7 @@ public class ReservationController {
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PutMapping("/restaurants/{restaurantId}/reservations")
     public ResponseEntity<Object> updateReservation(@Valid @RequestBody ReservationUpdateRequest request,
-                                                   @PathVariable Long restaurantId) {
+                                                    @PathVariable Long restaurantId) {
 
         Reservation reservation = conversionService.convert(request, Reservation.class);
         Reservation updatedReservation = reservationService.update(restaurantId, reservation);

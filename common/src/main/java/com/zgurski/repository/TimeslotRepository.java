@@ -1,6 +1,8 @@
 package com.zgurski.repository;
 
 import com.zgurski.domain.hibernate.CalendarDay;
+import com.zgurski.domain.hibernate.Reservation;
+import com.zgurski.domain.hibernate.Restaurant;
 import com.zgurski.domain.hibernate.Timeslot;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -24,6 +26,9 @@ public interface TimeslotRepository extends JpaRepository<Timeslot, Long>,
             "and ts.isAvailable = true and ts.localTime >= :fromTime")
     List<Timeslot> findAllAvailableSlotsByMinutesFromNow(CalendarDay calendarDay, LocalTime fromTime);
 
+    Optional<Timeslot> findTimeslotByLocalTimeAndCalendarDay_LocalDateAndCalendarDay_Restaurant(
+            LocalTime localTime, LocalDate localDate, Restaurant restaurant);
+
 
 
 //    List<Timeslot> findAllByIsAvailableAndCalendarDay(Boolean isAvailable, CalendarDay calendarDay);
@@ -43,6 +48,13 @@ public interface TimeslotRepository extends JpaRepository<Timeslot, Long>,
     @Modifying
     @Query(value = "update Timeslot tsl set tsl.isAvailable = false, tsl.changed = NOW() where tsl.calendarDay = :calendarDay")
     void closeAllTimeslots(CalendarDay calendarDay);
+
+
+
+    @Modifying
+    @Query(value = "update Timeslot tsl set tsl.currentSlotCapacity = :currentCapacity, tsl.changed = NOW() " +
+            "where tsl = :timeslot")
+    void updateCurrentCapacity(Integer currentCapacity, Timeslot timeslot);
 
     @Modifying
     @Query(value = "update Timeslot tsl set tsl.isAvailable = false, tsl.isDeleted = true, tsl.changed = NOW() " +

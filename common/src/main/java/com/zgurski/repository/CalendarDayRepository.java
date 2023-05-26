@@ -32,6 +32,8 @@ public interface CalendarDayRepository extends JpaRepository<CalendarDay, Long>,
 
     List<CalendarDay> findCalendarDaysByRestaurant_RestaurantIdOrderByLocalDate(Long restaurantId);
 
+
+
     Boolean existsByLocalDateAndRestaurant_RestaurantId(LocalDate localDate, Long restaurantId);
 
     Boolean existsByCalendarDayId(Long calendarDayId);

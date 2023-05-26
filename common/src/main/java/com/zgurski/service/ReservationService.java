@@ -19,7 +19,14 @@ public interface ReservationService {
 
     List<Reservation> findReservationsByRestaurantId(Long id);
 
+    List<Reservation> findAllByDateAndRestaurantId(Long restaurantId, int year, int month, int day);
+
     List<Reservation> findByStatus(Long restaurantId, ReservationStatuses status);
+
+    List<Reservation> findAllByDateStatusAndRestaurantId(
+            Long restaurantId, ReservationStatuses status, int year, int month, int day);
+
+    List<Object> getOccupancyByHour(Long restaurantId, int year, int month, int day);
 
     Reservation save(Long restaurantId, Reservation reservation);
 

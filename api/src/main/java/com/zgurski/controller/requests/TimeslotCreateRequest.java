@@ -23,7 +23,11 @@ public class TimeslotCreateRequest {
     @NotNull
     private LocalTime localTime;
 
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "true", type = "boolean", description = "True, if timeslot is available.")
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "true", type = "boolean", description = "True, if timeslot is available")
     @NotNull
     private Boolean isAvailable;
+
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "20", type = "integer", description = "Maximum guests per time")
+    @NotNull
+    private Integer maxSlotCapacity;
 }

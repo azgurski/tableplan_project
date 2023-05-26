@@ -19,8 +19,6 @@ public class TimeslotCreateConverter extends TimeslotBaseConverter<TimeslotCreat
     public Timeslot convert(TimeslotCreateRequest request) {
         Timeslot timeslot = new Timeslot();
 
-//       TODO check
-//        timeslot.setMaxSlotCapacity(request.getMaxSlotCapacity());
         timeslot.setCreated(Timestamp.valueOf(LocalDateTime.now()));
         timeslot.setChanged(Timestamp.valueOf(LocalDateTime.now()));
 

@@ -139,7 +139,7 @@ public class TimeslotController {
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PostMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/timeslots/set-to-default")
-    public ResponseEntity<Object> saveTimeslotsBySchedule(
+    public ResponseEntity<Object> saveTimeslotsAccordingToDefault(
             @PathVariable Long restaurantId, @Min(value = 2023) @Max(value = 2024) @PathVariable int year,
             @PathVariable int month, @PathVariable int day) {
 

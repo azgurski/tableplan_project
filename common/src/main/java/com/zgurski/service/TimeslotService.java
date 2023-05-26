@@ -1,10 +1,12 @@
 package com.zgurski.service;
 
 import com.zgurski.domain.hibernate.CalendarDay;
+import com.zgurski.domain.hibernate.Restaurant;
 import com.zgurski.domain.hibernate.Timeslot;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +34,7 @@ public interface TimeslotService {
 
     CalendarDay resetAllTimeslots(Long restaurantId, int year, int month, int day);
 
+    Boolean checkTimeslotCapacity(int newReservationPartySize, LocalDate localDate, LocalTime localTime, Restaurant restaurant);
 
     CalendarDay setTimeslotsToDefault(Long restaurantId, int year, int month, int day);
 
