@@ -46,7 +46,8 @@ public class DefaultExceptionHandler {
             IllegalArgumentException.class,
             InvalidInputValueException.class,
             IOException.class,
-            SQLException.class
+            SQLException.class,
+            NullPointerException.class
     })
     public ResponseEntity<Object> handleInvalidInputValueException(Exception ex) {
 

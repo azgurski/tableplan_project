@@ -10,6 +10,7 @@ import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -36,6 +37,7 @@ public class ReservationCreateRequest {
 
     @NotNull
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "National Str. 10", type = "integer", description = "number of guests")
+    @Min(1)
     private Integer partySize;
 
     @NotNull

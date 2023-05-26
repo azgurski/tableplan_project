@@ -21,6 +21,7 @@ public abstract class RestaurantBaseConverter<S, T> implements Converter<S, T> {
         restaurantForUpdate.setRestaurantTimezone(request.getRestaurantTimezone());
         restaurantForUpdate.setImageURL(request.getImageURL());
         restaurantForUpdate.setLogoURL(request.getLogoURL());
+        restaurantForUpdate.setDefaultTimeslotCapacity(request.getDefaultTimeslotCapacity());
 
         /* System fields filling */
         restaurantForUpdate.setIsDeleted(false);

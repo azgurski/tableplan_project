@@ -46,7 +46,7 @@ public interface TimeslotRepository extends JpaRepository<Timeslot, Long>,
     Boolean existsByTimeslotId(Long timeslotId);
 
     @Modifying
-    @Query(value = "update Timeslot tsl set tsl.isAvailable = false, tsl.changed = NOW() where tsl.calendarDay = :calendarDay")
+    @Query(value = "update Timeslot tsl set tsl.isAvailable = false, tsl.maxSlotCapacity = 0, tsl.changed = NOW() where tsl.calendarDay = :calendarDay")
     void closeAllTimeslots(CalendarDay calendarDay);
 
 
@@ -57,7 +57,7 @@ public interface TimeslotRepository extends JpaRepository<Timeslot, Long>,
     void updateCurrentCapacity(Integer currentCapacity, Timeslot timeslot);
 
     @Modifying
-    @Query(value = "update Timeslot tsl set tsl.isAvailable = false, tsl.isDeleted = true, tsl.changed = NOW() " +
+    @Query(value = "update Timeslot tsl set tsl.isAvailable = false, tsl.maxSlotCapacity = 0, tsl.isDeleted = true, tsl.changed = NOW() " +
             "where tsl.timeslotId = :timeslotId")
     void deleteSoft(Long timeslotId);
 }

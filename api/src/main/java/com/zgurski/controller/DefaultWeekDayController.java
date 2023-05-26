@@ -54,16 +54,17 @@ public class DefaultWeekDayController {
                 weekDayService.findAllPageable(PageRequest.of(page, size))), HttpStatus.OK);
     }
 
+    //TODO hateoas
     @GetMapping("/restaurants/{restaurantId}/schedules")
-    public ResponseEntity<Object> findScheduleByRestaurantId(@PathVariable Long restaurantId) {
+    public ResponseEntity<Object> findSchedulesByRestaurantId(@PathVariable Long restaurantId) {
 
         return new ResponseEntity<>(Collections.singletonMap("defaultWeekDay",
                 weekDayService.findScheduleByRestaurantId(restaurantId)), HttpStatus.OK);
     }
 
-    @GetMapping("/restaurants/{restaurantId}/schedules/{scheduleId}")
+    @GetMapping("/restaurants/{restaurantId}/schedules/{defaultWeekDayId}")
     public ResponseEntity<Object> findByWeekDayIdAndRestaurantId(
-            @PathVariable("scheduleId") Long weekDayId,
+            @PathVariable("defaultWeekDayId") Long weekDayId,
             @PathVariable Long restaurantId) {
 
         return new ResponseEntity<>(Collections.singletonMap("defaultWeekDay",

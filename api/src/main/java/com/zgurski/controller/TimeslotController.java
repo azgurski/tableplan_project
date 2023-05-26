@@ -3,6 +3,7 @@ package com.zgurski.controller;
 import com.zgurski.controller.requests.TimeslotCreateRequest;
 import com.zgurski.controller.requests.TimeslotSearchLocalTimeCriteria;
 import com.zgurski.controller.requests.TimeslotUpdateRequest;
+import com.zgurski.domain.enums.ReservationStatuses;
 import com.zgurski.domain.hibernate.CalendarDay;
 import com.zgurski.domain.hibernate.Timeslot;
 import com.zgurski.exception.FailedTransactionException;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -48,22 +50,11 @@ public class TimeslotController {
 
     private final TimeslotService timeslotService;
 
-    private final TimeslotRepository timeslotRepository;
-
     private final ConversionService conversionService;
 
     @Value("${spring.data.rest.default-page-size}")
     private Integer size;
 
-    @Value("${year.current}")
-    private Integer currentYear;
-
-    @Value("${year.next}")
-    private Integer nextYear;
-
-
-
-    //TODO наверное не надо или сделать только по calendarDate
     @GetMapping("/timeslots")
     public ResponseEntity<Object> findAllTimeslotsForAllRestaurants() {
         return new ResponseEntity<>(Collections.singletonMap("timeslots",
@@ -89,10 +80,10 @@ public class TimeslotController {
     }
 
 
-    @GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/timeslots/{isAvailable}")
+    @GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/timeslots/search")
     public ResponseEntity<Object> findAllByIsAvailableByDate(
             @PathVariable Long restaurantId, @PathVariable int year, @PathVariable int month, @PathVariable int day,
-            @PathVariable Boolean isAvailable) {
+            @Valid @RequestParam Boolean isAvailable) {
 
         List<Timeslot> timeslots = timeslotService.findAllByIsAvailable(restaurantId, year, month, day, isAvailable);
 
@@ -107,8 +98,7 @@ public class TimeslotController {
         return new ResponseEntity<>(Collections.singletonMap("timeslots", timeslots), HttpStatus.OK);
     }
 
-
-    @GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/timeslots/search")
+    @GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/timeslots/search-by-local-time")
     public ResponseEntity<Object> findOneByLocalTime(
             @PathVariable Long restaurantId, @PathVariable int year, @PathVariable int month, @PathVariable int day,
             @Valid @ModelAttribute TimeslotSearchLocalTimeCriteria criteria, BindingResult bindingResult) {
@@ -162,7 +152,6 @@ public class TimeslotController {
         return new ResponseEntity<>(Collections.singletonMap("timeslot", updatedTimeslot), HttpStatus.CREATED);
     }
 
-    //может только в hateoas показывать
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PutMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/timeslots/reset-all")
     public ResponseEntity<Object> resetTimeslots(
@@ -173,7 +162,6 @@ public class TimeslotController {
 
         return new ResponseEntity<>(Collections.singletonMap("calendarDay", updatedDay), HttpStatus.CREATED);
     }
-
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @DeleteMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/timeslots/{timeslotId}")
@@ -188,6 +176,4 @@ public class TimeslotController {
 
     }
 
-
-    //TODO findTimesByTimeslotId
 }

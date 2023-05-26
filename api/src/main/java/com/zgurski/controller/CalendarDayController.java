@@ -1,8 +1,10 @@
 package com.zgurski.controller;
 
+import com.zgurski.controller.hateoas.CalendarDayModelAssembler;
 import com.zgurski.controller.requests.CalendarDayCreateRequest;
 import com.zgurski.controller.requests.CalendarDayUpdateRequest;
 import com.zgurski.domain.hibernate.CalendarDay;
+import com.zgurski.domain.hibernate.Restaurant;
 import com.zgurski.exception.FailedTransactionException;
 import com.zgurski.service.CalendarDayService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -10,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Propagation;
@@ -25,6 +28,9 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,13 +38,13 @@ public class CalendarDayController {
 
     private final CalendarDayService calendarDayService;
 
+    private final CalendarDayModelAssembler calendarDayAssembler;
+
     private final ConversionService conversionService;
 
     @Value("${spring.data.rest.default-page-size}")
     private Integer size;
 
-    @Value("${crud_limit_offset.default-page-size-by-month}")
-    private Integer monthPageSize;
 
     @GetMapping("/availability")
     public ResponseEntity<Object> findAllForAllRestaurants() {
@@ -56,30 +62,35 @@ public class CalendarDayController {
     }
 
     @GetMapping("/restaurants/{restaurantId}/availability")
-    public ResponseEntity<Object> findAllForNextSixtyDays(@PathVariable Long restaurantId) {
+    public ResponseEntity<List<EntityModel<CalendarDay>>> findAllForNextSixtyDays(@PathVariable Long restaurantId) {
 
-        return new ResponseEntity<>(Collections.singletonMap("calendarDay",
-                calendarDayService.findAllForNextSixtyDays(restaurantId)), HttpStatus.OK);
+        List<EntityModel<CalendarDay>> calendarDays = calendarDayService.findAllForNextSixtyDays(restaurantId).stream()
+                .map(calendarDayAssembler::toModel)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(calendarDays);
     }
 
     @GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}")
-    public ResponseEntity<Object> findAllByMonth(
+    public ResponseEntity<List<EntityModel<CalendarDay>>> findAllByMonth(
             @PathVariable Long restaurantId, @PathVariable int year, @PathVariable int month) {
 
-        return new ResponseEntity<>(Collections.singletonMap("calendarDay",
-                calendarDayService.findAllByMonth(restaurantId, year, month)), HttpStatus.OK);
+        List<EntityModel<CalendarDay>> calendarDays = calendarDayService.findAllByMonth(restaurantId, year, month).stream()
+                .map(calendarDayAssembler::toModel)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(calendarDays);
     }
 
     @GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}")
-    public ResponseEntity<Object> findByDateAndRestaurantId
+    public ResponseEntity<EntityModel<CalendarDay>> findByDateAndRestaurantId
             (@PathVariable Long restaurantId, @PathVariable int year, @PathVariable int month, @PathVariable int day) {
 
-        return new ResponseEntity<>(Collections.singletonMap("calendarDay",
-                calendarDayService.findByDateAndRestaurantId(restaurantId, year, month, day)), HttpStatus.OK);
+        CalendarDay calendarDay = calendarDayService.findByDateAndRestaurantId(restaurantId, year, month, day).get();
+        EntityModel<CalendarDay> calendarDayEntityModel = calendarDayAssembler.toModel(calendarDay);
+
+        return ResponseEntity.ok(calendarDayEntityModel);
     }
-
-
-    //TODO findTimesByWeekDay
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PostMapping("/restaurants/{restaurantId}/availability")
@@ -112,5 +123,5 @@ public class CalendarDayController {
                 "CalendarDay with id={" + calendarDayService.deleteSoft(restaurantId, calendarDayId) +
                         "} is deleted."), HttpStatus.OK);
 
-    } //TODO return message with Calendar Date
+    }
 }

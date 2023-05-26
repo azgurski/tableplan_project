@@ -1,5 +1,6 @@
 package com.zgurski.controller;
 
+import com.zgurski.controller.hateoas.ReservationModelAssembler;
 import com.zgurski.controller.requests.ReservationCreateRequest;
 import com.zgurski.controller.requests.ReservationSearchCriteria;
 import com.zgurski.controller.requests.ReservationUpdateRequest;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Propagation;
@@ -31,6 +33,9 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,12 +45,17 @@ public class ReservationController {
 
     private final ConversionService conversionService;
 
+    private final ReservationModelAssembler reservationModelAssembler;
+
     @Value("${spring.data.rest.default-page-size}")
     private Integer size;
 
+    @Value("${response.entity.name.reservations}")
+    private String reservationsString;
+
     @GetMapping("/reservations")
     public ResponseEntity<Object> findAllReservationsForAllRestaurants() {
-        return new ResponseEntity<>(Collections.singletonMap("reservations",
+        return new ResponseEntity<>(Collections.singletonMap(reservationsString,
                 reservationService.findAll()), HttpStatus.OK);
     }
 
@@ -54,38 +64,43 @@ public class ReservationController {
             @Parameter(name = "page", example = "1", required = true)
             @PathVariable("page") int page) {
 
-        return new ResponseEntity<>(Collections.singletonMap("reservations",
+        return new ResponseEntity<>(Collections.singletonMap(reservationsString,
                 reservationService.findAllPageable(PageRequest.of(page, size))), HttpStatus.OK);
     }
 
     @GetMapping("/restaurants/{restaurantId}/reservations/{reservationId}")
-    public ResponseEntity<Object> findReservationById(@PathVariable Long restaurantId,
-                                                      @PathVariable Long reservationId) {
+    public ResponseEntity<EntityModel<Reservation>> findReservationById(@PathVariable Long restaurantId,
+                                                                  @PathVariable Long reservationId) {
 
-        return new ResponseEntity<>(Collections.singletonMap("reservations",
-                reservationService.findByReservationIdAndRestaurantId(reservationId, restaurantId)), HttpStatus.OK);
+      Reservation reservation = reservationService.findByReservationIdAndRestaurantId(reservationId, restaurantId).get();
+      EntityModel<Reservation> reservationEntityModel = reservationModelAssembler.toModel(reservation);
+
+        return ResponseEntity.ok(reservationEntityModel);
     }
 
     @GetMapping("/restaurants/{restaurantId}/reservations")
-    public ResponseEntity<Object> findAllReservationsByRestaurantId(@PathVariable Long restaurantId) {
+    public ResponseEntity<List<EntityModel<Reservation>>> findAllReservationsByRestaurantId(@PathVariable Long restaurantId) {
 
-        return new ResponseEntity<>(Collections.singletonMap("reservations",
-                reservationService
-                        .findReservationsByRestaurantId(restaurantId)), HttpStatus.OK);
+        List<EntityModel<Reservation>> reservations = reservationService
+                .findReservationsByRestaurantId(restaurantId).stream()
+                .map(reservationModelAssembler::toModel)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(reservations);
     }
 
+    //TODO check exceptions
     @GetMapping("/restaurants/{restaurantId}/reservations/search")
-    public ResponseEntity<Object> findAllReservationsByStatus(
+    public ResponseEntity<List<EntityModel<Reservation>>> findAllReservationsByStatus(
             @PathVariable Long restaurantId,
-            @Valid @ModelAttribute ReservationSearchCriteria criteria, BindingResult bindingResult) {
+            @RequestParam("status") ReservationStatuses reservationStatus) {
 
-        if (bindingResult.hasErrors()) {
-            throw new InvalidInputValueException();
-        }
+        List<EntityModel<Reservation>> reservations = reservationService
+                .findByStatus(restaurantId, reservationStatus).stream()
+                .map(reservationModelAssembler::toModel)
+                .collect(Collectors.toList());
 
-        return new ResponseEntity<>(Collections.singletonMap("reservations",
-                reservationService
-                        .findByStatus(restaurantId, criteria.getReservationStatus())), HttpStatus.OK);
+        return ResponseEntity.ok(reservations);
     }
 
     @GetMapping("/restaurants/{restaurantId}/reservations/{year}/{month}/{day}")
@@ -93,19 +108,22 @@ public class ReservationController {
             @PathVariable Long restaurantId,
             @PathVariable int year, @PathVariable int month, @PathVariable int day) {
 
-        return new ResponseEntity<>(Collections.singletonMap("reservations",
+        return new ResponseEntity<>(Collections.singletonMap(reservationsString,
                 reservationService.findAllByDateAndRestaurantId(
                         restaurantId, year, month, day)), HttpStatus.OK);
     }
 
     @GetMapping("/restaurants/{restaurantId}/reservations/{year}/{month}/{day}/search")
-    public ResponseEntity<Object> findAllReservationsByDate(
+    public ResponseEntity<List<EntityModel<Reservation>>> findAllReservationsByDateAndStatus(
             @PathVariable Long restaurantId, @RequestParam ReservationStatuses status,
             @PathVariable int year, @PathVariable int month, @PathVariable int day) {
 
-        return new ResponseEntity<>(Collections.singletonMap("reservations",
-                reservationService.findAllByDateStatusAndRestaurantId(
-                        restaurantId, status, year, month, day)), HttpStatus.OK);
+        List<EntityModel<Reservation>> reservations = reservationService
+                .findAllByDateStatusAndRestaurantId(restaurantId, status, year, month, day).stream()
+                .map(reservationModelAssembler::toModel)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(reservations);
     }
 
     @GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/occupancy")
@@ -117,6 +135,14 @@ public class ReservationController {
                 reservationService.getOccupancyByHour(restaurantId, year, month, day)), HttpStatus.OK);
     }
 
+    //@GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/occupancy")
+    //    public ResponseEntity<Object> findOccupancyByDate(@PathVariable Long restaurantId,
+    //                                                      @PathVariable int year, @PathVariable int month, @PathVariable int day) {
+    //
+    //        return new ResponseEntity<>(Collections.singletonMap(
+    //                "Occupancy by hours for calendarDay={" + LocalDate.of(year, month, day) + "}",
+    //                reservationService.getOccupancyByHour(restaurantId, year, month, day)), HttpStatus.OK);
+    //    }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PostMapping("/restaurants/{restaurantId}/reservations")
@@ -149,8 +175,4 @@ public class ReservationController {
                 "Reservation with id={" + reservationService.deleteSoft(restaurantId, reservationId) +
                         "} is deleted."), HttpStatus.OK);
     }
-
-    //TODO search Criteria query by by ReservationCode, byDate, ByGuestName, ByEmail
-    //TODO function summary party size for each day
-    //TODO PUT status / guest Detais
 }

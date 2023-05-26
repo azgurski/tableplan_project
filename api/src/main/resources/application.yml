@@ -66,6 +66,12 @@ crud_limit_offset:
 year.current: 2023
 year.next: 2024
 
+---
+response.entity.name:
+  restaurants: "restaurants"
+  reservations: "reservations"
+
+
 
 
 

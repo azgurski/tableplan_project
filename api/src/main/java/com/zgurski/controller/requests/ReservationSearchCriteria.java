@@ -12,6 +12,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+//TODO удалить
 @Setter
 @Getter
 @RequiredArgsConstructor

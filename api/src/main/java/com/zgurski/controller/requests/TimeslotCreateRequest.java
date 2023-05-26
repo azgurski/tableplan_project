@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -29,5 +30,6 @@ public class TimeslotCreateRequest {
 
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "20", type = "integer", description = "Maximum guests per time")
     @NotNull
+    @Min(0)
     private Integer maxSlotCapacity;
 }

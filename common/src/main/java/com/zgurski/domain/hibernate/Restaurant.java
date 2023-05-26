@@ -92,6 +92,9 @@ public class Restaurant {
     @Column(name = "is_deleted")
     private Boolean isDeleted;
 
+    @Column(name = "default_timeslot_capacity")
+    private Integer defaultTimeslotCapacity;
+
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "emailUserAuth", column = @Column(name = "auth_email")),

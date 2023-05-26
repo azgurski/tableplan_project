@@ -112,6 +112,8 @@ public class TimeslotServiceImpl implements TimeslotService {
         CalendarDay calendarDay = calendarDayService
                 .findByDateAndRestaurantId(restaurantId, year, month, day).get();
 
+
+        //TODO check all saves
         if (timeslotRepository.existsTimeslotByLocalTimeAndCalendarDay(timeslot.getLocalTime(), calendarDay)) {
             throw new EntityNotFoundException(messageGenerator
                     .createNoDuplicatesAllowedByLocalTimeMessage(Timeslot.class, timeslot.getLocalTime().toString()));
@@ -263,6 +265,8 @@ public class TimeslotServiceImpl implements TimeslotService {
         DefaultWeekDay defaultWeekDay = defaultWeekDayService
                 .findDefaultWeekDayByDayOfWeekAndRestaurant_RestaurantId(dayOfWeek, restaurantId).get();
 
+        int defaultMaxCapacity = calendarDay.getRestaurant().getDefaultTimeslotCapacity();
+
         Set<DefaultTime> defaultTimes = defaultWeekDay.getDefaultTimes();
 
         List<LocalTime> localTimeList = defaultTimes.stream().map(
@@ -273,6 +277,7 @@ public class TimeslotServiceImpl implements TimeslotService {
             Timeslot timeslot = Timeslot.builder()
                     .localTime(localTimeList.get(index))
                     .isAvailable(true)
+                    .maxSlotCapacity(defaultMaxCapacity)
                     .created(Timestamp.valueOf(LocalDateTime.now()))
                     .changed(Timestamp.valueOf(LocalDateTime.now()))
                     .isDeleted(false)

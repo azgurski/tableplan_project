@@ -10,6 +10,7 @@ import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.ZoneId;
@@ -72,6 +73,11 @@ public class RestaurantCreateRequest {
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "https://logourl.com", type = "string", description = "restaurant logo URL")
     @Size(min = 2, max = 500)
     private String logoURL;
+
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "15", type = "integer", description = "default number of guests per time")
+    @NotNull
+    @Min(0)
+    private Integer defaultTimeslotCapacity;
 
 //    private String auth_email;
 //

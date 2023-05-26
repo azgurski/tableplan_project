@@ -1,6 +1,7 @@
 package com.zgurski.controller;
 
 
+import com.zgurski.controller.hateoas.RestaurantModelAssembler;
 import com.zgurski.controller.requests.RestaurantCreateRequest;
 import com.zgurski.controller.requests.RestaurantUpdateRequest;
 import com.zgurski.domain.hibernate.Restaurant;
@@ -17,6 +18,7 @@ import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Propagation;
@@ -49,6 +51,8 @@ public class RestaurantController {
 
     private final ConversionService conversionService;
 
+    private final RestaurantModelAssembler restaurantAssembler;
+
     @Value("${spring.data.rest.default-page-size}")
     private Integer size;
 
@@ -68,11 +72,30 @@ public class RestaurantController {
     }
 
     @GetMapping("/{restaurantId}")
-    public ResponseEntity<Object> findRestaurantById(@PathVariable Long restaurantId) {
+    public ResponseEntity<EntityModel<Restaurant>> findRestaurantById(@PathVariable Long restaurantId) {
 
-        return new ResponseEntity<>(Collections.singletonMap("restaurant",
-                restaurantService.findById(restaurantId)), HttpStatus.OK);
+        Restaurant restaurant = restaurantService.findById(restaurantId).get();
+        EntityModel<Restaurant> restaurantEntityModel = restaurantAssembler.toModel(restaurant);
+
+        return ResponseEntity.ok(restaurantEntityModel);
+
+
+
+//        return new ResponseEntity<>(restaurantAssembler.toModel(restaurant), HttpStatus.OK);
     }
+
+//    public EntityModel<Restaurant> findRestaurantById(@PathVariable Long restaurantId) {
+//
+//        return restaurantAssembler.toModel(restaurantService.findById(restaurantId).get());
+//    }
+
+//    @GetMapping("/{restaurantId}")
+//    public ResponseEntity<Object> findRestaurantById(@PathVariable Long restaurantId) {
+//
+//        return new ResponseEntity<>(Collections.singletonMap("restaurant",
+//                restaurantService.findById(restaurantId)), HttpStatus.OK);
+//    }
+
 
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
