@@ -1,8 +1,7 @@
 package com.zgurski.service;
 
 import com.zgurski.domain.enums.ReservationStatuses;
-import com.zgurski.domain.hibernate.Reservation;
-import com.zgurski.domain.hibernate.Restaurant;
+import com.zgurski.domain.entities.Reservation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

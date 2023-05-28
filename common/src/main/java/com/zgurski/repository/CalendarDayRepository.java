@@ -1,13 +1,11 @@
 package com.zgurski.repository;
 
-import com.zgurski.domain.hibernate.CalendarDay;
-import org.checkerframework.checker.units.qual.C;
+import com.zgurski.domain.entities.CalendarDay;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;

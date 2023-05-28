@@ -1,7 +1,6 @@
 package com.zgurski.controller.requests;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.zgurski.domain.enums.ReservationStatuses;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,7 +9,6 @@ import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;

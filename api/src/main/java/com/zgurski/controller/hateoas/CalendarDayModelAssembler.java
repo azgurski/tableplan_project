@@ -2,7 +2,7 @@ package com.zgurski.controller.hateoas;
 
 import com.zgurski.controller.CalendarDayController;
 import com.zgurski.controller.TimeslotController;
-import com.zgurski.domain.hibernate.CalendarDay;
+import com.zgurski.domain.entities.CalendarDay;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
@@ -26,7 +26,7 @@ public class CalendarDayModelAssembler implements RepresentationModelAssembler<C
         LocalDate nextCalendarMonth = calendarDate.plusMonths(1);
 
         Link linkSelfThisDay = linkTo(methodOn(CalendarDayController.class)
-                .findByDateAndRestaurantId(restaurantId, calendarDate.getYear(),
+                .findOneByDateAndRestaurantId(restaurantId, calendarDate.getYear(),
                         calendarDate.getMonthValue(), calendarDate.getDayOfMonth()))
                 .withSelfRel();
 
@@ -40,7 +40,7 @@ public class CalendarDayModelAssembler implements RepresentationModelAssembler<C
                 .withRel("availability-for-current-month");
 
         Link linkNextDay = linkTo(methodOn(CalendarDayController.class)
-                .findByDateAndRestaurantId(restaurantId, nextCalendarDate.getYear(), nextCalendarDate.getMonthValue(),
+                .findOneByDateAndRestaurantId(restaurantId, nextCalendarDate.getYear(), nextCalendarDate.getMonthValue(),
                         nextCalendarDate.getDayOfMonth()))
                 .withRel("availability-for-following-day");
 

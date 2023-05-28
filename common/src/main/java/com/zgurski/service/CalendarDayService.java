@@ -1,6 +1,6 @@
 package com.zgurski.service;
 
-import com.zgurski.domain.hibernate.CalendarDay;
+import com.zgurski.domain.entities.CalendarDay;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -17,6 +17,8 @@ public interface CalendarDayService {
     List<CalendarDay> findAllForNextSixtyDays(Long id);
 
     List<CalendarDay> findAllByMonth(Long restaurantId, int year, int month);
+
+    Optional<CalendarDay> findById(Long restaurantId, Long calendarDayId);
 
     Optional<CalendarDay> findByCalendarDayIdAndRestaurantId(Long calendarDayId, Long restaurantId);
 

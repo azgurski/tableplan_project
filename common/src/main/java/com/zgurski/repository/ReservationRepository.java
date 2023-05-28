@@ -1,8 +1,8 @@
 package com.zgurski.repository;
 
 import com.zgurski.domain.enums.ReservationStatuses;
-import com.zgurski.domain.hibernate.Reservation;
-import com.zgurski.domain.hibernate.Restaurant;
+import com.zgurski.domain.entities.Reservation;
+import com.zgurski.domain.entities.Restaurant;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

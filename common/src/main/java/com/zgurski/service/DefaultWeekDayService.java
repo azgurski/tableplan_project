@@ -1,15 +1,13 @@
 package com.zgurski.service;
 
-import com.zgurski.domain.hibernate.DefaultTime;
-import com.zgurski.domain.hibernate.DefaultWeekDay;
-import com.zgurski.domain.hibernate.Reservation;
+import com.zgurski.domain.entities.DefaultTime;
+import com.zgurski.domain.entities.DefaultWeekDay;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.DayOfWeek;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public interface DefaultWeekDayService {
     List<DefaultWeekDay> findAll();
@@ -18,8 +16,12 @@ public interface DefaultWeekDayService {
 
     Optional<DefaultWeekDay> findByDefaultWeekDayIdAndRestaurantId(Long defaultWeekDayId, Long restaurantId);
 
-    Optional<DefaultWeekDay> findDefaultWeekDayByDayOfWeekAndRestaurant_RestaurantId(
+    Optional<DefaultWeekDay> findDefaultWeekDayByDayOfWeekIsOpenAndRestaurant_RestaurantId(
             DayOfWeek dayOfWeek, Long restaurantId);
+
+    Optional<DefaultWeekDay> findByDayOfWeekAndRestaurant_RestaurantId(
+            DayOfWeek dayOfWeek, Long restaurantId);
+
 
     List<DefaultWeekDay> findScheduleByRestaurantId(Long id);
 

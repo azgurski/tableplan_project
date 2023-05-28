@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -54,6 +55,7 @@ public class DefaultExceptionHandler {
             InvalidInputValueException.class,
             IOException.class,
             SQLException.class,
+            IncorrectResultSizeDataAccessException.class,
             NullPointerException.class,
             DataIntegrityViolationException.class,
             MissingServletRequestParameterException.class

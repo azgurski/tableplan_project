@@ -1,7 +1,7 @@
 package com.zgurski.util.email;
 
-import com.zgurski.domain.hibernate.Reservation;
-import com.zgurski.domain.hibernate.Restaurant;
+import com.zgurski.domain.entities.Reservation;
+import com.zgurski.domain.entities.Restaurant;
 import com.zgurski.exception.EmailNotSentException;
 import com.zgurski.util.CustomErrorMessageGenerator;
 import lombok.RequiredArgsConstructor;

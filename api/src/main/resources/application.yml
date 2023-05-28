@@ -57,7 +57,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: tableplan.info@gmail.com
-    password: tsvp lqvp ehmg blqn
+    password: fclb ljee gxgq hjyn
     default-encoding: UTF-8
 
   thymeleaf:

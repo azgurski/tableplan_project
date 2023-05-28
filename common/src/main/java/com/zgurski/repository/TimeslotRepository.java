@@ -1,9 +1,8 @@
 package com.zgurski.repository;
 
-import com.zgurski.domain.hibernate.CalendarDay;
-import com.zgurski.domain.hibernate.Reservation;
-import com.zgurski.domain.hibernate.Restaurant;
-import com.zgurski.domain.hibernate.Timeslot;
+import com.zgurski.domain.entities.CalendarDay;
+import com.zgurski.domain.entities.Restaurant;
+import com.zgurski.domain.entities.Timeslot;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -48,8 +47,6 @@ public interface TimeslotRepository extends JpaRepository<Timeslot, Long>,
     @Modifying
     @Query(value = "update Timeslot tsl set tsl.isAvailable = false, tsl.maxSlotCapacity = 0, tsl.changed = NOW() where tsl.calendarDay = :calendarDay")
     void closeAllTimeslots(CalendarDay calendarDay);
-
-
 
     @Modifying
     @Query(value = "update Timeslot tsl set tsl.currentSlotCapacity = :newCapacity, tsl.changed = NOW() " +

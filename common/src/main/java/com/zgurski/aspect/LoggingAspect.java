@@ -23,7 +23,7 @@ public class LoggingAspect {
 //        log.info("Method " + joinPoint.getSignature().getName() + " finished");
 //    }
 
-    @Pointcut("execution(* com.zgurski.service.TimeslotServiceImpl.*.*(..))")
+    @Pointcut("execution(* com.zgurski.service.impl.TimeslotServiceImpl.*.*(..))")
     public void aroundRepositoryPointcut() {
     }
 

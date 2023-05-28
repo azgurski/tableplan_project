@@ -4,7 +4,7 @@ import com.zgurski.controller.CalendarDayController;
 import com.zgurski.controller.DefaultWeekDayController;
 import com.zgurski.controller.ReservationController;
 import com.zgurski.controller.RestaurantController;
-import com.zgurski.domain.hibernate.Restaurant;
+import com.zgurski.domain.entities.Restaurant;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
@@ -26,20 +26,20 @@ public class RestaurantModelAssembler implements RepresentationModelAssembler<Re
     public EntityModel<Restaurant> toModel(Restaurant restaurant) {
 
         Link linkSelf = linkTo(methodOn(RestaurantController.class)
-                .findRestaurantById(restaurant.getRestaurantId())).withSelfRel();
+                .findOneById(restaurant.getRestaurantId())).withSelfRel();
 
         Link linkReservations = linkTo(methodOn(ReservationController.class)
-                .findAllReservationsByRestaurantId(restaurant.getRestaurantId())).withRel("reservations");
+                .findAllByRestaurantId(restaurant.getRestaurantId())).withRel("reservations");
 
         //todo add all reservations today
 
         Link linkAvailabilityToday = linkTo(methodOn(CalendarDayController.class)
-                .findByDateAndRestaurantId(restaurant.getRestaurantId(),
+                .findOneByDateAndRestaurantId(restaurant.getRestaurantId(),
                         calendarDate.getYear(), calendarDate.getMonthValue(), calendarDate.getDayOfMonth()))
                 .withRel("availability-for-today");
 
         Link linkAvailabilityTomorrow = linkTo(methodOn(CalendarDayController.class)
-                .findByDateAndRestaurantId(restaurant.getRestaurantId(),
+                .findOneByDateAndRestaurantId(restaurant.getRestaurantId(),
                         nextCalendarDate.getYear(), nextCalendarDate.getMonthValue(), nextCalendarDate.getDayOfMonth()))
                 .withRel("availability-for-tomorrow");
 
@@ -47,7 +47,7 @@ public class RestaurantModelAssembler implements RepresentationModelAssembler<Re
                 .findAllForNextSixtyDays(restaurant.getRestaurantId())).withRel("availability-next-60-days");
 
         Link linkSchedule = linkTo(methodOn(DefaultWeekDayController.class)
-                .findSchedulesByRestaurantId(restaurant.getRestaurantId())).withRel("default-schedule");
+                .findAllByRestaurantId(restaurant.getRestaurantId())).withRel("default-schedule");
 
         return EntityModel.of(restaurant, linkSelf, linkReservations, linkAvailabilityToday, linkAvailabilityTomorrow,
                 linkAvailabilityNextSixtyDays, linkSchedule);

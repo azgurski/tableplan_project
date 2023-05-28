@@ -1,8 +1,8 @@
 package com.zgurski.service;
 
-import com.zgurski.domain.hibernate.CalendarDay;
-import com.zgurski.domain.hibernate.Restaurant;
-import com.zgurski.domain.hibernate.Timeslot;
+import com.zgurski.domain.entities.CalendarDay;
+import com.zgurski.domain.entities.Restaurant;
+import com.zgurski.domain.entities.Timeslot;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

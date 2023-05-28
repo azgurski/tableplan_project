@@ -1,7 +1,6 @@
 package com.zgurski.service;
 
-import com.zgurski.domain.hibernate.Restaurant;
-import com.zgurski.repository.RestaurantRepository;
+import com.zgurski.domain.entities.Restaurant;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
