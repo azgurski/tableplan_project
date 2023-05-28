@@ -52,9 +52,9 @@ public interface TimeslotRepository extends JpaRepository<Timeslot, Long>,
 
 
     @Modifying
-    @Query(value = "update Timeslot tsl set tsl.currentSlotCapacity = :currentCapacity, tsl.changed = NOW() " +
+    @Query(value = "update Timeslot tsl set tsl.currentSlotCapacity = :newCapacity, tsl.changed = NOW() " +
             "where tsl = :timeslot")
-    void updateCurrentCapacity(Integer currentCapacity, Timeslot timeslot);
+    void updateCurrentCapacity(Integer newCapacity, Timeslot timeslot);
 
     @Modifying
     @Query(value = "update Timeslot tsl set tsl.isAvailable = false, tsl.maxSlotCapacity = 0, tsl.isDeleted = true, tsl.changed = NOW() " +

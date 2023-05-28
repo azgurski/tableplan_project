@@ -26,7 +26,6 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -102,7 +101,7 @@ public class TimeslotServiceImpl implements TimeslotService {
         Optional<Timeslot> timeslot = timeslotRepository.findByLocalTimeAndCalendarDay_LocalDate
                 (localTime, LocalDate.of(year, month, day));
 
-        checkIfTimeslotPresent(localTime, timeslot);
+        checkIfTimeslotOptionalPresent(localTime, timeslot);
         return timeslot;
     }
 
@@ -321,7 +320,7 @@ public class TimeslotServiceImpl implements TimeslotService {
         }
     }
 
-    private Optional<Timeslot> checkIfTimeslotPresent(LocalTime localTime, Optional<Timeslot> timeslot) {
+    private Optional<Timeslot> checkIfTimeslotOptionalPresent(LocalTime localTime, Optional<Timeslot> timeslot) {
         if (timeslot.isPresent()) {
             return timeslot;
         } else {
@@ -351,20 +350,19 @@ public class TimeslotServiceImpl implements TimeslotService {
         }
     }
 
-    public Boolean checkTimeslotCapacity(int newReservationPartySize, LocalDate localDate, LocalTime localTime, Restaurant restaurant) {
+    public Boolean checkTimeslotCapacity(int incrementPartySize, LocalDate localDate, LocalTime localTime, Restaurant restaurant) {
 
         Optional<Timeslot> timeslot = timeslotRepository
                 .findTimeslotByLocalTimeAndCalendarDay_LocalDateAndCalendarDay_Restaurant(
                         localTime, localDate, restaurant);
 
-        checkIfTimeslotPresent(localTime, timeslot);
+        checkIfTimeslotOptionalPresent(localTime, timeslot);
 
         Integer currentSlotCapacity = timeslot.get().getCurrentSlotCapacity();
-
-        currentSlotCapacity += newReservationPartySize;
+        currentSlotCapacity += incrementPartySize;
 
         if (currentSlotCapacity <= timeslot.get().getMaxSlotCapacity()) {
-            timeslotRepository.updateCurrentCapacity(currentSlotCapacity, timeslot.get());
+//            timeslotRepository.updateCurrentCapacity(currentSlotCapacity, timeslot.get());
             return true;
 
         } else {
@@ -372,4 +370,54 @@ public class TimeslotServiceImpl implements TimeslotService {
                     .createEntityNotAvailableByTimeMessage(Restaurant.class, localDate, localTime));
         }
     }
+
+    public Timeslot updateTimeslotCapacity(int incrementPartySize, LocalDate localDate, LocalTime localTime, Restaurant restaurant) {
+
+        Optional<Timeslot> timeslot = timeslotRepository
+                .findTimeslotByLocalTimeAndCalendarDay_LocalDateAndCalendarDay_Restaurant(
+                        localTime, localDate, restaurant);
+
+        checkIfTimeslotOptionalPresent(localTime, timeslot);
+        Long timeslotId = timeslot.get().getTimeslotId();
+
+        Integer currentSlotCapacity = timeslot.get().getCurrentSlotCapacity();
+        currentSlotCapacity += incrementPartySize;
+
+        timeslotRepository.updateCurrentCapacity(currentSlotCapacity, timeslot.get());
+
+        return timeslotRepository.findById(timeslotId).get();
+
+//        if (currentSlotCapacity <= timeslot.get().getMaxSlotCapacity()) {
+//            timeslotRepository.updateCurrentCapacity(currentSlotCapacity, timeslot.get());
+//            return true;
+
+//        } else {
+//            throw new EntityNotAddedException(messageGenerator
+//                    .createEntityNotAvailableByTimeMessage(Restaurant.class, localDate, localTime));
+//        }
+    }
+
+
+
+//    public Boolean checkTimeslotCapacity(int newReservationPartySize, LocalDate localDate, LocalTime localTime, Restaurant restaurant) {
+//
+//        Optional<Timeslot> timeslot = timeslotRepository
+//                .findTimeslotByLocalTimeAndCalendarDay_LocalDateAndCalendarDay_Restaurant(
+//                        localTime, localDate, restaurant);
+//
+//        checkIfTimeslotPresent(localTime, timeslot);
+//
+//        Integer currentSlotCapacity = timeslot.get().getCurrentSlotCapacity();
+//
+//        currentSlotCapacity += newReservationPartySize;
+//
+//        if (currentSlotCapacity <= timeslot.get().getMaxSlotCapacity()) {
+//            timeslotRepository.updateCurrentCapacity(currentSlotCapacity, timeslot.get());
+//            return true;
+//
+//        } else {
+//            throw new EntityNotAddedException(messageGenerator
+//                    .createEntityNotAvailableByTimeMessage(Restaurant.class, localDate, localTime));
+//        }
+//    }
 }

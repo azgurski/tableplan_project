@@ -30,9 +30,11 @@ public interface ReservationService {
 
     Reservation save(Long restaurantId, Reservation reservation);
 
-    Reservation update(Long restaurantId, Reservation reservation);
+    Reservation update(Long restaurantId, Reservation reservationToUpdate, int initialPartySize);
 
-    Boolean checkIfReservationExistsById(Long id);
+    Reservation updateStatus(Long restaurantId, Long reservationId, ReservationStatuses status);
 
     Long deleteSoft(Long restaurantId, Long reservationId);
+
+    Boolean checkIfReservationExistsById(Long id);
 }

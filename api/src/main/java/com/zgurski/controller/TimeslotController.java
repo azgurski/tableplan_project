@@ -80,7 +80,7 @@ public class TimeslotController {
     }
 
 
-    @GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/timeslots/search")
+    @GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/timeslots/status")
     public ResponseEntity<Object> findAllByIsAvailableByDate(
             @PathVariable Long restaurantId, @PathVariable int year, @PathVariable int month, @PathVariable int day,
             @Valid @RequestParam Boolean isAvailable) {
@@ -98,7 +98,7 @@ public class TimeslotController {
         return new ResponseEntity<>(Collections.singletonMap("timeslots", timeslots), HttpStatus.OK);
     }
 
-    @GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/timeslots/search-by-local-time")
+    @GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/timeslots/begin-time")
     public ResponseEntity<Object> findOneByLocalTime(
             @PathVariable Long restaurantId, @PathVariable int year, @PathVariable int month, @PathVariable int day,
             @Valid @ModelAttribute TimeslotSearchLocalTimeCriteria criteria, BindingResult bindingResult) {

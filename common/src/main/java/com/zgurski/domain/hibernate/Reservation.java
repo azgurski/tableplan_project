@@ -73,7 +73,7 @@ public class Reservation {
 
     @Column
     @Enumerated(EnumType.STRING)
-    private ReservationStatuses status = ReservationStatuses.NOT_CONFIRMED;
+    private ReservationStatuses status = ReservationStatuses.UNREAD;
 
     @Column
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")

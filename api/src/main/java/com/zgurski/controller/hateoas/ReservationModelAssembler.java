@@ -2,16 +2,21 @@ package com.zgurski.controller.hateoas;
 
 import com.zgurski.controller.ReservationController;
 import com.zgurski.controller.TimeslotController;
+import com.zgurski.controller.requests.ReservationCreateRequest;
 import com.zgurski.domain.enums.ReservationStatuses;
 import com.zgurski.domain.hibernate.CalendarDay;
 import com.zgurski.domain.hibernate.Reservation;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.QueryParameter;
+import org.springframework.hateoas.mediatype.Affordances;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.afford;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -54,8 +59,8 @@ public class ReservationModelAssembler implements RepresentationModelAssembler<R
                 .withRel("confirmed-reservations-for-previous-day");
 
         Link linkReservationsNotConfirmed = linkTo(methodOn(ReservationController.class)
-                .findAllReservationsByStatus(restaurantId, ReservationStatuses.NOT_CONFIRMED))
-                .withRel("all-not-confirmed-reservations");
+                .findAllReservationsByStatus(restaurantId, ReservationStatuses.UNREAD))
+                .withRel("all-unread-reservations");
 
         Link linkOccupancyPerHour = linkTo(methodOn(ReservationController.class)
                 .findOccupancyByDate(restaurantId, date.getYear(), date.getMonthValue(), date.getDayOfMonth()))

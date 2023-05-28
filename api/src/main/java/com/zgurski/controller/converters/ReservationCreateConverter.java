@@ -22,8 +22,8 @@ public class ReservationCreateConverter extends ReservationBaseConverter<Reserva
 
         Reservation reservation = new Reservation();
 
-        reservation.setPnr(randomValuesGenerator.generateReservationCode().toUpperCase());
-        reservation.setStatus(ReservationStatuses.NOT_CONFIRMED);
+        reservation.setPnr(randomValuesGenerator.generateReservationCode());
+
 
         /* System fields filling */
         reservation.setCreated(Timestamp.valueOf(LocalDateTime.now()));

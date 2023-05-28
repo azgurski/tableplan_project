@@ -18,6 +18,9 @@ public enum ApplicationErrorCodes {
     /* 404 */
     ENTITY_NOT_FOUND(40401),
 
+    /* 424 */
+    EMAIL_NOT_SENT(42401),
+
     /* 500 */
     FATAL_ERROR(50001);
 

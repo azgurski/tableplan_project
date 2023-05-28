@@ -1,5 +1,6 @@
 package com.zgurski.util;
 
+import com.zgurski.domain.enums.ReservationStatuses;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -41,6 +42,14 @@ public class CustomErrorMessageGenerator {
 
     public String createEntityNotAvailableByTimeMessage(Class clazz, LocalDate localDate, LocalTime localTime) {
         return clazz.getSimpleName() + " is full on " + localDate + " at {" + localTime + "}. Try another slot.";
+    }
+
+    public String createEmailNotSentMessage(String emailAddress) {
+        return "Failed to send an email to {" + emailAddress + "}.";
+    }
+
+    public String createImpossibleToUpdateEntity(Class clazz, ReservationStatuses status) {
+        return "Impossible to update " + clazz.getSimpleName().toLowerCase() + " with status ={" + status + "}.";
     }
 
 }

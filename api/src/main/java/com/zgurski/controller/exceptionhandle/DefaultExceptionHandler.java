@@ -1,6 +1,8 @@
 package com.zgurski.controller.exceptionhandle;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.sun.mail.util.MailConnectException;
+import com.zgurski.exception.EmailNotSentException;
 import com.zgurski.exception.EntityIncorrectOwnerException;
 import com.zgurski.exception.EntityNotAddedException;
 import com.zgurski.exception.EntityNotFoundException;
@@ -12,19 +14,24 @@ import com.zgurski.util.RandomValuesGenerator;
 import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
 import org.springframework.core.convert.ConversionFailedException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.mail.MailSendException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import javax.mail.MessagingException;
+import javax.mail.SendFailedException;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -47,7 +54,9 @@ public class DefaultExceptionHandler {
             InvalidInputValueException.class,
             IOException.class,
             SQLException.class,
-            NullPointerException.class
+            NullPointerException.class,
+            DataIntegrityViolationException.class,
+            MissingServletRequestParameterException.class
     })
     public ResponseEntity<Object> handleInvalidInputValueException(Exception ex) {
 
@@ -137,6 +146,26 @@ public class DefaultExceptionHandler {
 
         ErrorContainer error = buildErrorContainer(ex, 40401, ex.getMessage());
         return new ResponseEntity<>(Collections.singletonMap("error", error), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler({
+            MailSendException.class,
+            MailConnectException.class,
+            SendFailedException.class
+    })
+    public ResponseEntity<Object> handleMailException(Exception ex) {
+
+        ErrorContainer error = buildErrorContainer(ex, 42401, "Failed to send an email.");
+        return new ResponseEntity<>(Collections.singletonMap("error", error), HttpStatus.FAILED_DEPENDENCY);
+    }
+
+    @ExceptionHandler({
+            EmailNotSentException.class
+    })
+    public ResponseEntity<Object> handleMailNotSentException(EmailNotSentException ex) {
+
+        ErrorContainer error = buildErrorContainer(ex, 42401, ex.getMessage());
+        return new ResponseEntity<>(Collections.singletonMap("error", error), HttpStatus.FAILED_DEPENDENCY);
     }
 
 

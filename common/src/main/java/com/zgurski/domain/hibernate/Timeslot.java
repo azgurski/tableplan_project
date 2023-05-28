@@ -64,7 +64,7 @@ public class Timeslot {
 
     @Column(name = "current_slot_capacity")
     @JsonIgnore
-    private Integer currentSlotCapacity;
+    private Integer currentSlotCapacity = 0;
 
     @Column(name = "max_slot_capacity")
     private Integer maxSlotCapacity;

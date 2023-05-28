@@ -8,6 +8,7 @@ import com.zgurski.domain.enums.ReservationStatuses;
 import com.zgurski.domain.hibernate.Reservation;
 import com.zgurski.exception.FailedTransactionException;
 import com.zgurski.exception.InvalidInputValueException;
+import com.zgurski.repository.ReservationRepository;
 import com.zgurski.service.ReservationService;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,8 @@ public class ReservationController {
     private final ConversionService conversionService;
 
     private final ReservationModelAssembler reservationModelAssembler;
+
+    private final ReservationRepository reservationRepository;
 
     @Value("${spring.data.rest.default-page-size}")
     private Integer size;
@@ -135,15 +138,6 @@ public class ReservationController {
                 reservationService.getOccupancyByHour(restaurantId, year, month, day)), HttpStatus.OK);
     }
 
-    //@GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/occupancy")
-    //    public ResponseEntity<Object> findOccupancyByDate(@PathVariable Long restaurantId,
-    //                                                      @PathVariable int year, @PathVariable int month, @PathVariable int day) {
-    //
-    //        return new ResponseEntity<>(Collections.singletonMap(
-    //                "Occupancy by hours for calendarDay={" + LocalDate.of(year, month, day) + "}",
-    //                reservationService.getOccupancyByHour(restaurantId, year, month, day)), HttpStatus.OK);
-    //    }
-
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PostMapping("/restaurants/{restaurantId}/reservations")
     public ResponseEntity<Object> saveReservation(
@@ -157,11 +151,23 @@ public class ReservationController {
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PutMapping("/restaurants/{restaurantId}/reservations")
-    public ResponseEntity<Object> updateReservation(@Valid @RequestBody ReservationUpdateRequest request,
+    public ResponseEntity<Object> updateReservationAsGuest(@Valid @RequestBody ReservationUpdateRequest request,
                                                     @PathVariable Long restaurantId) {
 
-        Reservation reservation = conversionService.convert(request, Reservation.class);
-        Reservation updatedReservation = reservationService.update(restaurantId, reservation);
+        Integer initialPartySize = reservationRepository.getPartySize(request.getReservationId());
+        Reservation reservationToUpdate = conversionService.convert(request, Reservation.class);
+
+        Reservation updatedReservation = reservationService.update(restaurantId, reservationToUpdate, initialPartySize);
+
+        return new ResponseEntity<>(Collections.singletonMap("reservation", updatedReservation), HttpStatus.CREATED);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
+    @PutMapping("/restaurants/{restaurantId}/reservations/{reservationId}/change-status")
+    public ResponseEntity<Object> updateReservationStatus(@PathVariable Long restaurantId, @PathVariable Long reservationId,
+                                                          @RequestParam ReservationStatuses status) {
+
+        Reservation updatedReservation = reservationService.updateStatus(restaurantId, reservationId, status);
 
         return new ResponseEntity<>(Collections.singletonMap("reservation", updatedReservation), HttpStatus.CREATED);
     }

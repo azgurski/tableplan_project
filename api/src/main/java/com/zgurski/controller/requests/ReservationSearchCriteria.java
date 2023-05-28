@@ -21,7 +21,7 @@ import javax.validation.constraints.Size;
 public class ReservationSearchCriteria {
 
 
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "NOT_CONFIRMED", type = "ReservationStatuses", description = "Reservation status")
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "NOT_READ", type = "ReservationStatuses", description = "Reservation status")
     @NotNull
     private ReservationStatuses reservationStatus;
 

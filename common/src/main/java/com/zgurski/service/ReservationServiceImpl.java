@@ -1,33 +1,40 @@
 package com.zgurski.service;
 
 import com.zgurski.domain.enums.ReservationStatuses;
-import com.zgurski.domain.hibernate.DefaultWeekDay;
 import com.zgurski.domain.hibernate.Reservation;
 import com.zgurski.domain.hibernate.Restaurant;
 import com.zgurski.exception.EntityIncorrectOwnerException;
+import com.zgurski.exception.EntityNotAddedException;
 import com.zgurski.exception.EntityNotFoundException;
 import com.zgurski.repository.ReservationRepository;
+import com.zgurski.util.email.EmailContext;
 import com.zgurski.util.CustomErrorMessageGenerator;
+import com.zgurski.util.email.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ReservationServiceImpl implements ReservationService {
 
-    private final RestaurantService restaurantService;
-
     private final ReservationRepository reservationRepository;
 
-    private final CustomErrorMessageGenerator messageGenerator;
+    private final RestaurantService restaurantService;
 
     public final TimeslotService timeslotService;
+
+    private final EmailService emailService;
+
+    private final CustomErrorMessageGenerator messageGenerator;
 
     public List<Reservation> findAll() {
 
@@ -116,28 +123,100 @@ public class ReservationServiceImpl implements ReservationService {
         return reservationRepository.save(reservation);
     }
 
-    public Reservation update(Long restaurantId, Reservation reservation) {
+    public Reservation update(Long restaurantId, Reservation reservationToUpdate, int initialPartySize) {
 
-        Long reservationId = reservation.getReservationId();
+
         Restaurant restaurant = restaurantService.findById(restaurantId).get();
 
-        checkIfReservationExistsById(reservationId);
-        checkBelongingReservationToRestaurant(restaurantId, reservationId);
+        Integer incrementPartySize = reservationToUpdate.getPartySize() - initialPartySize;
+
 
         timeslotService.checkTimeslotCapacity(
-                reservation.getPartySize(), reservation.getLocalDate(), reservation.getLocalTime(), restaurant);
+                incrementPartySize, reservationToUpdate.getLocalDate(), reservationToUpdate.getLocalTime(), restaurant);
 
-        reservation.setRestaurant(restaurant);
+        timeslotService.updateTimeslotCapacity(-initialPartySize, reservationToUpdate.getLocalDate(),
+                reservationToUpdate.getLocalTime(), restaurant);
 
-        return reservationRepository.save(reservation);
+        reservationToUpdate.setStatus(ReservationStatuses.UNREAD);
+        reservationToUpdate.setRestaurant(restaurant);
+
+        return reservationRepository.saveAndFlush(reservationToUpdate);
+    }
+
+    public Reservation updateStatus(Long restaurantId, Long reservationId, ReservationStatuses newStatus) {
+
+        Restaurant restaurant = restaurantService.findById(restaurantId).get();
+        Reservation reservation = findByReservationIdAndRestaurantId(reservationId, restaurantId).get();
+
+        ReservationStatuses currentStatus = reservation.getStatus();
+        Integer partySize = reservation.getPartySize();
+
+        /* unread -> cancelled, not confirmed -> just change rsv.status and send email */
+        /* unread -> confirmed -> increase current timeslot capacity, change rsv.status and send email */
+        /* confirmed -> cancelled, not confirmed -> decrease capacity, change rsv.status and send email */
+
+        switch (newStatus) {
+
+            case CONFIRMED -> {
+
+                checkIfWasUnreadUpdateTimeslotAndReservation(newStatus, restaurant, reservation, currentStatus, partySize);
+                emailService.prepareConfirmedEmail(restaurant, reservation);
+            }
+
+            case NOT_CONFIRMED -> {
+
+                checkIfWasConfirmedUpdateTimeslotAndReservation(
+                        newStatus, restaurant, reservation, currentStatus, partySize);
+                emailService.prepareNotConfirmedEmail(restaurant, reservation);
+            }
+
+            case CANCELLED -> {
+
+                checkIfWasConfirmedUpdateTimeslotAndReservation(
+                        newStatus, restaurant, reservation, currentStatus, partySize);
+                emailService.prepareCancelledEmail(restaurant, reservation);
+            }
+
+            default -> reservationRepository.updateStatus(reservationId, newStatus);
+        }
+
+        return reservationRepository.findByReservationId(reservationId).get();
+    }
+
+    private void checkIfWasUnreadUpdateTimeslotAndReservation(ReservationStatuses newStatus, Restaurant restaurant, Reservation reservation, ReservationStatuses currentStatus, Integer partySize) {
+
+        if (currentStatus == ReservationStatuses.UNREAD) {
+            timeslotService.updateTimeslotCapacity(partySize, reservation.getLocalDate(),
+                    reservation.getLocalTime(), restaurant);
+
+            reservation.setStatus(newStatus);
+            reservationRepository.saveAndFlush(reservation);
+
+        } else {
+            throw new EntityNotAddedException(messageGenerator
+                    .createImpossibleToUpdateEntity(Reservation.class, currentStatus));
+        }
+    }
+
+    private void checkIfWasConfirmedUpdateTimeslotAndReservation(ReservationStatuses newStatus, Restaurant restaurant, Reservation reservation, ReservationStatuses currentStatus, Integer partySize) {
+
+        if (currentStatus == ReservationStatuses.CONFIRMED) {
+            timeslotService.updateTimeslotCapacity(-partySize, reservation.getLocalDate(),
+                    reservation.getLocalTime(), restaurant);
+        }
+
+        reservation.setStatus(newStatus);
+        reservationRepository.saveAndFlush(reservation);
     }
 
     public Long deleteSoft(Long restaurantId, Long reservationId) {
 
-        findByReservationIdAndRestaurantId(reservationId, restaurantId);
+        checkBelongingReservationToRestaurant(restaurantId, reservationId);
         reservationRepository.deleteSoft(reservationId);
 
-        return reservationId;
+        findByReservationIdAndRestaurantId(reservationId, restaurantId);
+
+        return findByReservationIdAndRestaurantId(reservationId, restaurantId).get().getReservationId();
     }
 
 
@@ -187,4 +266,5 @@ public class ReservationServiceImpl implements ReservationService {
                     .createNotFoundByIdMessage(Page.class, reservationPage.toString()));
         }
     }
+
 }

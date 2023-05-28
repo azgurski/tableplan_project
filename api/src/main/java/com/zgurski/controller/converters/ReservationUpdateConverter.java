@@ -29,9 +29,10 @@ public class ReservationUpdateConverter extends ReservationBaseConverter<Reserva
         //       TODO check
 
         service.checkIfReservationExistsById(request.getReservationId());
+
         Optional<Reservation> reservation = repository.findByReservationId(request.getReservationId());
 
-        reservation.get().setStatus(ReservationStatuses.NOT_CONFIRMED);
+
         reservation.get().setChanged(Timestamp.valueOf(LocalDateTime.now()));
 
         return doConvert(reservation.get(), request);

@@ -37,7 +37,7 @@ spring:
     properties:
       hibernate:
         current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
-        format_sql: true
+        format_sql: false
         jdbc:
           batch_size: 5
         generate_statistics: true
@@ -46,6 +46,26 @@ spring:
     rest:
       default-page-size: 1
 
+  mail:
+
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls.enable: true
+
+    host: smtp.gmail.com
+    port: 587
+    username: tableplan.info@gmail.com
+    password: tsvp lqvp ehmg blqn
+    default-encoding: UTF-8
+
+  thymeleaf:
+    cache: true
+    check-template: true
+    check-template-location: true
+    enabled: true
+    encoding: UTF-8
 
 ---
 
@@ -67,9 +87,39 @@ year.current: 2023
 year.next: 2024
 
 ---
+
 response.entity.name:
   restaurants: "restaurants"
   reservations: "reservations"
+
+---
+
+email:
+
+  subject:
+    reservation:
+      confirmed: "Reservation is confirmed"
+      not-confirmed: "Reservation is not confirmed"
+      cancelled: "Reservation is cancelled"
+
+  template-path:
+    reservation:
+      confirmed: "email_confirmation.html"
+      not-confirmed: "email_non_confirmation.html"
+      cancelled: "email_annulation.html"
+
+  pattern:
+    date: "eeee dd MMMM"
+
+  address-details:
+    from: "tableplan.info@gmail.com"
+    to: "zzgurezz@gmail.com"
+    recipient-email: "zzgurezz@gmail.com"
+    language: "En"
+
+
+---
+
 
 
 
