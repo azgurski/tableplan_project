@@ -1,5 +1,9 @@
 package com.zgurski.controller;
 
+import com.zgurski.controller.openapi.timeslot.TimeslotFindAllAvailableTodayOpenApi;
+import com.zgurski.controller.openapi.timeslot.TimeslotFindAllByIsAvailableByDateOpenApi;
+import com.zgurski.controller.openapi.timeslot.TimeslotResetAllOpenApi;
+import com.zgurski.controller.openapi.timeslot.TimeslotSaveAllAccordingToScheduleOpenApi;
 import com.zgurski.controller.requests.TimeslotCreateRequest;
 import com.zgurski.controller.requests.searchcriteria.TimeslotSearchLocalTimeCriteria;
 import com.zgurski.controller.requests.TimeslotUpdateRequest;
@@ -8,7 +12,9 @@ import com.zgurski.domain.entities.Timeslot;
 import com.zgurski.exception.FailedTransactionException;
 import com.zgurski.exception.InvalidInputValueException;
 import com.zgurski.service.TimeslotService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
@@ -40,6 +46,7 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @Validated
+@Tag(name = "Timeslot", description = "Managing timeslots availability (08:00, 08:15 etc).")
 public class TimeslotController {
 
     private final TimeslotService timeslotService;
@@ -49,6 +56,7 @@ public class TimeslotController {
     @Value("${spring.data.rest.default-page-size}")
     private Integer size;
 
+    @Operation(hidden = true)
     @GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/timeslots/begin-time")
     public ResponseEntity<Object> findOneByLocalTime(
 
@@ -65,6 +73,7 @@ public class TimeslotController {
         return new ResponseEntity<>(Collections.singletonMap("timeslots", timeslot), HttpStatus.OK);
     }
 
+    @TimeslotFindAllAvailableTodayOpenApi
     @GetMapping("/restaurants/{restaurantId}/availability/timeslots/within-thirty-minutes")
     public ResponseEntity<Object> findAllAvailableToday(@PathVariable Long restaurantId) {
 
@@ -73,6 +82,7 @@ public class TimeslotController {
         return new ResponseEntity<>(Collections.singletonMap("timeslots", timeslots), HttpStatus.OK);
     }
 
+    @Operation(hidden = true)
     @GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/timeslots")
     public ResponseEntity<Object> findAllByCalendarDate(
 
@@ -83,6 +93,7 @@ public class TimeslotController {
         return new ResponseEntity<>(Collections.singletonMap("timeslots", timeslots), HttpStatus.OK);
     }
 
+    @TimeslotFindAllByIsAvailableByDateOpenApi
     @GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/timeslots/status")
     public ResponseEntity<Object> findAllByIsAvailableByDate(
 
@@ -94,6 +105,7 @@ public class TimeslotController {
         return new ResponseEntity<>(Collections.singletonMap("timeslots", timeslots), HttpStatus.OK);
     }
 
+    @TimeslotSaveAllAccordingToScheduleOpenApi
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PostMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/timeslots/set-to-default")
     public ResponseEntity<Object> saveAllAccordingToSchedule(
@@ -106,7 +118,7 @@ public class TimeslotController {
         return new ResponseEntity<>(Collections.singletonMap("calendarDay", calendarDay), HttpStatus.CREATED);
     }
 
-    //TODO batch update
+    @TimeslotResetAllOpenApi
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PutMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/timeslots/reset-all")
     public ResponseEntity<Object> resetAll(
@@ -121,6 +133,7 @@ public class TimeslotController {
 
      /* CRUD */
 
+    @Operation(hidden = true)
     @GetMapping("/timeslots")
     public ResponseEntity<Object> findAll() {
 
@@ -128,6 +141,7 @@ public class TimeslotController {
                 timeslotService.findAll()), HttpStatus.OK);
     }
 
+    @Operation(hidden = true)
     @GetMapping("/timeslots/page/{page}")
     public ResponseEntity<Object> findAllPageable(
 
@@ -137,6 +151,7 @@ public class TimeslotController {
                 timeslotService.findAllPageable(PageRequest.of(page, size))), HttpStatus.OK);
     }
 
+    @Operation(hidden = true)
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PostMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/timeslots")
     public ResponseEntity<Object> save(
@@ -150,6 +165,7 @@ public class TimeslotController {
         return new ResponseEntity<>(Collections.singletonMap("timeslot", savedTimeslot), HttpStatus.CREATED);
     }
 
+    @Operation(hidden = true)
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PutMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/timeslots")
     public ResponseEntity<Object> update(
@@ -163,6 +179,7 @@ public class TimeslotController {
         return new ResponseEntity<>(Collections.singletonMap("timeslot", updatedTimeslot), HttpStatus.CREATED);
     }
 
+    @Operation(hidden = true)
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @DeleteMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/timeslots/{timeslotId}")
     public ResponseEntity<Object> deleteSoft(

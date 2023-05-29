@@ -1,6 +1,15 @@
 package com.zgurski.controller;
 
 import com.zgurski.controller.hateoas.ReservationModelAssembler;
+import com.zgurski.controller.openapi.reservation.ReservationDeleteSoftOpenApi;
+import com.zgurski.controller.openapi.reservation.ReservationFindAllByDateAndRestaurantIdOpenApi;
+import com.zgurski.controller.openapi.reservation.ReservationFindAllByDateAndStatusOpenApi;
+import com.zgurski.controller.openapi.reservation.ReservationFindAllByRestaurantId;
+import com.zgurski.controller.openapi.reservation.ReservationFindOneByIdAndRestaurantIdOpenApi;
+import com.zgurski.controller.openapi.reservation.ReservationFindOccupancyByDateOpenApi;
+import com.zgurski.controller.openapi.reservation.ReservationSaveOpenApi;
+import com.zgurski.controller.openapi.reservation.ReservationUpdateProfileOpenApi;
+import com.zgurski.controller.openapi.reservation.ReservationUpdateStatusOpenApi;
 import com.zgurski.controller.requests.ReservationCreateRequest;
 import com.zgurski.controller.requests.ReservationUpdateRequest;
 import com.zgurski.domain.enums.ReservationStatuses;
@@ -8,7 +17,9 @@ import com.zgurski.domain.entities.Reservation;
 import com.zgurski.exception.FailedTransactionException;
 import com.zgurski.repository.ReservationRepository;
 import com.zgurski.service.ReservationService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
@@ -34,6 +45,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@Tag(name = "Reservation", description = "Managing reservations.")
 @RequiredArgsConstructor
 public class ReservationController {
 
@@ -51,15 +63,18 @@ public class ReservationController {
     @Value("${response.entity.name.reservations}")
     private String reservationsString;
 
+    @ReservationFindAllByDateAndRestaurantIdOpenApi
     @GetMapping("/restaurants/{restaurantId}/reservations/{year}/{month}/{day}")
-    public ResponseEntity<Object> findAllByDate(@PathVariable Long restaurantId,
-                                                @PathVariable int year, @PathVariable int month, @PathVariable int day) {
+    public ResponseEntity<Object> findAllByDateAndRestaurantId(
+            @PathVariable Long restaurantId,
+            @PathVariable int year, @PathVariable int month, @PathVariable int day) {
 
         return new ResponseEntity<>(Collections.singletonMap(reservationsString,
                 reservationService.findAllByDateAndRestaurantId(
                         restaurantId, year, month, day)), HttpStatus.OK);
     }
 
+    @ReservationFindAllByRestaurantId
     @GetMapping("/restaurants/{restaurantId}/reservations")
     public ResponseEntity<List<EntityModel<Reservation>>> findAllByRestaurantId(@PathVariable Long restaurantId) {
 
@@ -71,8 +86,8 @@ public class ReservationController {
         return ResponseEntity.ok(reservations);
     }
 
-    //TODO check exceptions
-    @GetMapping("/restaurants/{restaurantId}/reservations/search")
+    @Operation(hidden = true)
+    @GetMapping("/restaurants/{restaurantId}/reservations/all-days")
     public ResponseEntity<List<EntityModel<Reservation>>> findAllByStatus(
             @PathVariable Long restaurantId, @RequestParam("status") ReservationStatuses reservationStatus) {
 
@@ -84,6 +99,7 @@ public class ReservationController {
         return ResponseEntity.ok(reservations);
     }
 
+    @ReservationFindAllByDateAndStatusOpenApi
     @GetMapping("/restaurants/{restaurantId}/reservations/{year}/{month}/{day}/search")
     public ResponseEntity<List<EntityModel<Reservation>>> findAllByDateAndStatus(
             @PathVariable Long restaurantId, @RequestParam ReservationStatuses status,
@@ -97,7 +113,8 @@ public class ReservationController {
         return ResponseEntity.ok(reservations);
     }
 
-    @GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/occupancy")
+    @ReservationFindOccupancyByDateOpenApi
+    @GetMapping("/restaurants/{restaurantId}/reservations/{year}/{month}/{day}/occupancy")
     public ResponseEntity<Object> findOccupancyByDate(
             @PathVariable Long restaurantId, @PathVariable int year, @PathVariable int month, @PathVariable int day) {
 
@@ -106,8 +123,7 @@ public class ReservationController {
                 reservationService.getOccupancyByHour(restaurantId, year, month, day)), HttpStatus.OK);
     }
 
-    /* CRUD Methods */
-
+    @ReservationFindOneByIdAndRestaurantIdOpenApi
     @GetMapping("/restaurants/{restaurantId}/reservations/{reservationId}")
     public ResponseEntity<EntityModel<Reservation>> findOneById(@PathVariable Long restaurantId,
                                                                 @PathVariable Long reservationId) {
@@ -119,6 +135,9 @@ public class ReservationController {
         return ResponseEntity.ok(reservationEntityModel);
     }
 
+    /* CRUD Methods */
+
+    @Operation(hidden = true)
     @GetMapping("/reservations")
     public ResponseEntity<Object> findAll() {
 
@@ -126,6 +145,7 @@ public class ReservationController {
                 reservationService.findAll()), HttpStatus.OK);
     }
 
+    @Operation(hidden = true)
     @GetMapping("/reservations/page/{page}")
     public ResponseEntity<Object> findAllPageable(
             @Parameter(name = "page", example = "1", required = true) @PathVariable("page") int page) {
@@ -134,6 +154,7 @@ public class ReservationController {
                 reservationService.findAllPageable(PageRequest.of(page, size))), HttpStatus.OK);
     }
 
+    @ReservationSaveOpenApi
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PostMapping("/restaurants/{restaurantId}/reservations")
     public ResponseEntity<Object> save(
@@ -145,6 +166,7 @@ public class ReservationController {
         return new ResponseEntity<>(Collections.singletonMap("reservation", savedReservation), HttpStatus.CREATED);
     }
 
+    @ReservationUpdateProfileOpenApi
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PutMapping("/restaurants/{restaurantId}/reservations")
     public ResponseEntity<Object> updateReservationProfile(@Valid @RequestBody ReservationUpdateRequest request,
@@ -158,6 +180,7 @@ public class ReservationController {
         return new ResponseEntity<>(Collections.singletonMap("reservation", updatedReservation), HttpStatus.CREATED);
     }
 
+    @ReservationUpdateStatusOpenApi
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PutMapping("/restaurants/{restaurantId}/reservations/{reservationId}/change")
     public ResponseEntity<Object> updateReservationStatus(
@@ -169,6 +192,7 @@ public class ReservationController {
         return new ResponseEntity<>(Collections.singletonMap("reservation", updatedReservation), HttpStatus.CREATED);
     }
 
+    @ReservationDeleteSoftOpenApi
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @DeleteMapping("/restaurants/{restaurantId}/reservations/{reservationId}")
     public ResponseEntity<Object> deleteSoft(

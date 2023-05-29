@@ -1,12 +1,20 @@
 package com.zgurski.controller;
 
 import com.zgurski.controller.hateoas.CalendarDayModelAssembler;
+import com.zgurski.controller.openapi.calendarday.CalendarDayDeleteSoftOpenApi;
+import com.zgurski.controller.openapi.calendarday.CalendarDayFindAllByMonthOpenApi;
+import com.zgurski.controller.openapi.calendarday.CalendarDayFindAllForNextSixtyDays;
+import com.zgurski.controller.openapi.calendarday.CalendarDaySaveOpenApi;
+import com.zgurski.controller.openapi.calendarday.CalendarDayUpdateOpenApi;
+import com.zgurski.controller.openapi.calendarday.CalendarDayFindOneByDateAndRestaurantIdOpenApi;
 import com.zgurski.controller.requests.CalendarDayCreateRequest;
 import com.zgurski.controller.requests.CalendarDayUpdateRequest;
 import com.zgurski.domain.entities.CalendarDay;
 import com.zgurski.exception.FailedTransactionException;
 import com.zgurski.service.CalendarDayService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
@@ -31,6 +39,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "Calendar Day", description = "Managing restaurant's availability by calendar date.")
 public class CalendarDayController {
 
     private final CalendarDayService calendarDayService;
@@ -42,6 +51,7 @@ public class CalendarDayController {
     @Value("${spring.data.rest.default-page-size}")
     private Integer size;
 
+    @Operation(hidden = true)
     @GetMapping("/restaurants/{restaurantId}/availability/{calendarDateId}")
     public ResponseEntity<EntityModel<CalendarDay>> findOneByCalendarDateIdAndRestaurantId
             (@PathVariable Long restaurantId, @PathVariable Long calendarDateId) {
@@ -52,6 +62,7 @@ public class CalendarDayController {
         return ResponseEntity.ok(calendarDayEntityModel);
     }
 
+    @CalendarDayFindOneByDateAndRestaurantIdOpenApi
     @GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}")
     public ResponseEntity<EntityModel<CalendarDay>> findOneByDateAndRestaurantId
             (@PathVariable Long restaurantId, @PathVariable int year, @PathVariable int month, @PathVariable int day) {
@@ -62,6 +73,7 @@ public class CalendarDayController {
         return ResponseEntity.ok(calendarDayEntityModel);
     }
 
+    @CalendarDayFindAllByMonthOpenApi
     @GetMapping("/restaurants/{restaurantId}/availability/{year}/{month}")
     public ResponseEntity<List<EntityModel<CalendarDay>>> findAllByMonth(
             @PathVariable Long restaurantId, @PathVariable int year, @PathVariable int month) {
@@ -74,7 +86,7 @@ public class CalendarDayController {
         return ResponseEntity.ok(calendarDays);
     }
 
-
+    @CalendarDayFindAllForNextSixtyDays
     @GetMapping("/restaurants/{restaurantId}/availability")
     public ResponseEntity<List<EntityModel<CalendarDay>>> findAllForNextSixtyDays(@PathVariable Long restaurantId) {
 
@@ -87,6 +99,7 @@ public class CalendarDayController {
 
     /* CRUD */
 
+    @Operation(hidden = true)
     @GetMapping("/availability")
     public ResponseEntity<Object> findAll() {
 
@@ -94,6 +107,7 @@ public class CalendarDayController {
                 calendarDayService.findAll()), HttpStatus.OK);
     }
 
+    @Operation(hidden = true)
     @GetMapping("/availability/page/{page}")
     public ResponseEntity<Object> findAllPageable(
             @Parameter(name = "page", example = "1", required = true)
@@ -103,6 +117,7 @@ public class CalendarDayController {
                 calendarDayService.findAllPageable(PageRequest.of(page, size))), HttpStatus.OK);
     }
 
+    @CalendarDaySaveOpenApi
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PostMapping("/restaurants/{restaurantId}/availability")
     public ResponseEntity<Object> save(
@@ -114,6 +129,7 @@ public class CalendarDayController {
         return new ResponseEntity<>(Collections.singletonMap("calendarDay", savedCalendarDay), HttpStatus.CREATED);
     }
 
+    @CalendarDayUpdateOpenApi
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PutMapping("/restaurants/{restaurantId}/availability")
     public ResponseEntity<Object> update(
@@ -125,6 +141,7 @@ public class CalendarDayController {
         return new ResponseEntity<>(Collections.singletonMap("calendarDay", updatedCalendarDay), HttpStatus.CREATED);
     }
 
+    @CalendarDayDeleteSoftOpenApi
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @DeleteMapping("/restaurants/{restaurantId}/availability/{calendarDayId}")
     public ResponseEntity<Object> deleteSoft(@PathVariable Long restaurantId, @PathVariable Long calendarDayId) {

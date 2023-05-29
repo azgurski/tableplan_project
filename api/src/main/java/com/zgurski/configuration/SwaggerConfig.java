@@ -19,7 +19,7 @@ public class SwaggerConfig {
         return new Info()
                 .contact(contact())
                 .title("Tableplan Project")
-                .description("API for booking of tables in restaurants")
+                .description("API for booking a table in restaurant.")
                 .version("1.0")
                 .license(apiLicence());
     }

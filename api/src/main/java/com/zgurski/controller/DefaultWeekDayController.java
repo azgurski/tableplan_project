@@ -1,12 +1,20 @@
 package com.zgurski.controller;
 
 import com.zgurski.controller.hateoas.DefaultWeekDayModelAssembler;
+import com.zgurski.controller.openapi.defaultweekday.DefaultTimesFindAllOpenApi;
+import com.zgurski.controller.openapi.defaultweekday.DefaultWeekDayDeleteSoftOpenApi;
+import com.zgurski.controller.openapi.defaultweekday.DefaultWeekDayFindAllByRestaurantIdOpenApi;
+import com.zgurski.controller.openapi.defaultweekday.DefaultWeekDayFindOneByDayOfWeekAndRestaurantIdOpenApi;
+import com.zgurski.controller.openapi.defaultweekday.DefaultWeekDaySaveOpenApi;
+import com.zgurski.controller.openapi.defaultweekday.DefaultWeekDayUpdateOpenApi;
 import com.zgurski.controller.requests.DefaultWeekDayCreateRequest;
 import com.zgurski.controller.requests.DefaultWeekDayUpdateRequest;
 import com.zgurski.domain.entities.DefaultWeekDay;
 import com.zgurski.exception.FailedTransactionException;
 import com.zgurski.service.DefaultWeekDayService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
@@ -31,6 +39,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@Tag(name = "Default Week Day", description = "Managing default schedule for MONDAYs, TUESDAYs etc.")
 @RequiredArgsConstructor
 public class DefaultWeekDayController {
 
@@ -43,6 +52,7 @@ public class DefaultWeekDayController {
     @Value("${spring.data.rest.default-page-size}")
     private Integer size;
 
+    @DefaultWeekDayFindOneByDayOfWeekAndRestaurantIdOpenApi
     @GetMapping("/restaurants/{restaurantId}/schedules/schedule/{dayOfWeek}")
     public ResponseEntity<EntityModel<DefaultWeekDay>> findOneByDayOfWeekAndRestaurantId(
             @PathVariable("dayOfWeek") String dayOfWeekString, @PathVariable Long restaurantId) {
@@ -57,6 +67,7 @@ public class DefaultWeekDayController {
         return ResponseEntity.ok(defaultWeekDayEntityModel);
     }
 
+    @Operation(hidden = true)
     @GetMapping("/restaurants/{restaurantId}/schedules/{defaultWeekDayId}")
     public ResponseEntity<EntityModel<DefaultWeekDay>> findOneByIdAndRestaurantId(
             @PathVariable("defaultWeekDayId") Long weekDayId, @PathVariable Long restaurantId) {
@@ -69,6 +80,7 @@ public class DefaultWeekDayController {
         return ResponseEntity.ok(defaultWeekDayEntityModel);
     }
 
+    @DefaultWeekDayFindAllByRestaurantIdOpenApi
     @GetMapping("/restaurants/{restaurantId}/schedules")
     public ResponseEntity<List<EntityModel<DefaultWeekDay>>> findAllByRestaurantId(@PathVariable Long restaurantId) {
 
@@ -79,6 +91,7 @@ public class DefaultWeekDayController {
         return ResponseEntity.ok(schedules);
     }
 
+    @DefaultTimesFindAllOpenApi
     @GetMapping("/default-times")
     public ResponseEntity<Object> findAllDefaultTimes() {
 
@@ -88,6 +101,7 @@ public class DefaultWeekDayController {
 
     /* CRUD Methods */
 
+    @Operation(hidden = true)
     @GetMapping("/schedules")
     public ResponseEntity<Object> findAll() {
 
@@ -95,6 +109,7 @@ public class DefaultWeekDayController {
                 weekDayService.findAll()), HttpStatus.OK);
     }
 
+    @Operation(hidden = true)
     @GetMapping("/schedules/page/{page}")
     public ResponseEntity<Object> findAllPageable(
             @Parameter(name = "page", example = "1", required = true)
@@ -104,6 +119,7 @@ public class DefaultWeekDayController {
                 weekDayService.findAllPageable(PageRequest.of(page, size))), HttpStatus.OK);
     }
 
+    @DefaultWeekDaySaveOpenApi
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PostMapping("/restaurants/{restaurantId}/schedules")
     public ResponseEntity<Object> save(
@@ -115,6 +131,7 @@ public class DefaultWeekDayController {
         return new ResponseEntity<>(Collections.singletonMap("defaultWeekDay", savedWeekDay), HttpStatus.CREATED);
     }
 
+    @DefaultWeekDayUpdateOpenApi
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @PutMapping("/restaurants/{restaurantId}/schedules")
     public ResponseEntity<Object> update(
@@ -126,6 +143,7 @@ public class DefaultWeekDayController {
         return new ResponseEntity<>(Collections.singletonMap("defaultWeekDay", updatedWeekDay), HttpStatus.CREATED);
     }
 
+    @DefaultWeekDayDeleteSoftOpenApi
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = FailedTransactionException.class)
     @DeleteMapping("/restaurants/{restaurantId}/schedules/{defaultWeekDayId}")
     public ResponseEntity<Object> deleteSoft(@PathVariable Long restaurantId, @PathVariable Long defaultWeekDayId) {
