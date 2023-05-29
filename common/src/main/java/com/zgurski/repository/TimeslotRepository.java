@@ -17,7 +17,8 @@ import java.util.Optional;
 public interface TimeslotRepository extends JpaRepository<Timeslot, Long>,
         PagingAndSortingRepository<Timeslot, Long>, CrudRepository<Timeslot, Long> {
 
-    List<Timeslot> findAllByCalendarDay_LocalDateAndIsAvailableOrderByLocalTime(LocalDate localDate, Boolean isAvailable);
+    List<Timeslot> findAllByCalendarDay_LocalDateAndIsAvailableOrderByLocalTime(
+            LocalDate localDate, Boolean isAvailable);
 
     List<Timeslot> findAllByCalendarDayOrderByLocalTime(CalendarDay calendarDay);
 
@@ -28,10 +29,6 @@ public interface TimeslotRepository extends JpaRepository<Timeslot, Long>,
     Optional<Timeslot> findTimeslotByLocalTimeAndCalendarDay_LocalDateAndCalendarDay_Restaurant(
             LocalTime localTime, LocalDate localDate, Restaurant restaurant);
 
-
-
-//    List<Timeslot> findAllByIsAvailableAndCalendarDay(Boolean isAvailable, CalendarDay calendarDay);
-
     Optional<Timeslot> findByLocalTimeAndCalendarDay_LocalDate(LocalTime localTime, LocalDate localDate);
 
     Boolean existsTimeslotByLocalTimeAndCalendarDay(LocalTime localTime, CalendarDay calendarDay);
@@ -40,12 +37,11 @@ public interface TimeslotRepository extends JpaRepository<Timeslot, Long>,
 
     Boolean existsTimeslotByIsDeletedAndCalendarDay(Boolean isDeleted, CalendarDay calendarDay);
 
-//    Boolean existsTimeslotsByIsAvailableAndCalendarDay_IsOpen(Boolean isAvailableSlot, Boolean isOpenDay);
-
     Boolean existsByTimeslotId(Long timeslotId);
 
     @Modifying
-    @Query(value = "update Timeslot tsl set tsl.isAvailable = false, tsl.maxSlotCapacity = 0, tsl.changed = NOW() where tsl.calendarDay = :calendarDay")
+    @Query(value = "update Timeslot tsl set tsl.isAvailable = false, tsl.maxSlotCapacity = 0, tsl.changed = NOW() " +
+            "where tsl.calendarDay = :calendarDay")
     void closeAllTimeslots(CalendarDay calendarDay);
 
     @Modifying
@@ -54,7 +50,8 @@ public interface TimeslotRepository extends JpaRepository<Timeslot, Long>,
     void updateCurrentCapacity(Integer newCapacity, Timeslot timeslot);
 
     @Modifying
-    @Query(value = "update Timeslot tsl set tsl.isAvailable = false, tsl.maxSlotCapacity = 0, tsl.isDeleted = true, tsl.changed = NOW() " +
+    @Query(value = "update Timeslot tsl set tsl.isAvailable = false, tsl.maxSlotCapacity = 0, " +
+            "tsl.isDeleted = true, tsl.changed = NOW() " +
             "where tsl.timeslotId = :timeslotId")
     void deleteSoft(Long timeslotId);
 }

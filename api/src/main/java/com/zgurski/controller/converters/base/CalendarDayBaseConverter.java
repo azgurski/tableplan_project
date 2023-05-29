@@ -9,7 +9,7 @@ public abstract class CalendarDayBaseConverter<S, T> implements Converter<S, T> 
     public CalendarDay doConvert(CalendarDay calendarDayForUpdate,
                                  CalendarDayCreateRequest request) {
 
-        calendarDayForUpdate.setLocalDate(request.getLocalDate()); //TODO to check how with PathVariable {YYYY}{}{}
+        calendarDayForUpdate.setLocalDate(request.getLocalDate());
         calendarDayForUpdate.setIsOpen(request.getIsOpen());
 
         /* System fields filling */

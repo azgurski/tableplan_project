@@ -22,7 +22,8 @@ public interface DefaultWeekDayRepository extends JpaRepository<DefaultWeekDay, 
     Optional<DefaultWeekDay> findDefaultWeekDayByDayOfWeekAndIsOpenAndRestaurant_RestaurantId(
             DayOfWeek dayOfWeek, Boolean isOpen, Long restaurantId);
 
-    Optional<DefaultWeekDay> findByDayOfWeekAndRestaurant_RestaurantIdOrderByDayOfWeek(DayOfWeek dayOfWeek, Long restaurantId);
+    Optional<DefaultWeekDay> findByDayOfWeekAndRestaurant_RestaurantIdOrderByDayOfWeek(
+            DayOfWeek dayOfWeek, Long restaurantId);
 
     List<DefaultWeekDay> findDefaultWeekDaysByRestaurant_RestaurantIdOrderByDayOfWeek(Long restaurantId);
 

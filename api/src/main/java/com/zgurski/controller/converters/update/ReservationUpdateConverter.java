@@ -23,12 +23,8 @@ public class ReservationUpdateConverter extends ReservationBaseConverter<Reserva
     @Override
     public Reservation convert(ReservationUpdateRequest request) {
 
-        //       TODO check
-
         service.checkIfReservationExistsById(request.getReservationId());
-
         Optional<Reservation> reservation = repository.findByReservationId(request.getReservationId());
-
 
         reservation.get().setChanged(Timestamp.valueOf(LocalDateTime.now()));
 

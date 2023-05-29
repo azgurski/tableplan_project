@@ -30,9 +30,6 @@ import java.time.LocalTime;
         "restaurant"
 })
 @Table(name = "reservations")
-//@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-//@NamedQuery(name = "m_restaurant_multiple_ids_search", query = "select r from Restaurant where r.id = :restaurantIds)
-//@Cacheable
 public class Reservation {
 
     @Id
@@ -89,8 +86,4 @@ public class Reservation {
     @JoinColumn(name = "restaurant_id")
     @JsonBackReference
     private Restaurant restaurant;
-
-//    public String toString() {
-//        return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
-//    }
 }

@@ -8,7 +8,6 @@ import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotNull;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 
 @Setter
@@ -19,11 +18,13 @@ import java.time.LocalDate;
 @Schema(description = "CalendarDay (Availability for Date) CreateRequest")
 public class CalendarDayCreateRequest {
 
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "2023-05-31", type = "string", description = "Calendar date")
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "2023-05-31", type = "string",
+            description = "Calendar date")
     @NotNull
     private LocalDate localDate;
 
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "true", type = "boolean", description = "True, if restaurant is open on this day.")
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "true", type = "boolean",
+            description = "True, if restaurant is open on this day.")
     @NotNull
     private Boolean isOpen;
 }

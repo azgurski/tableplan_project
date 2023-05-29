@@ -74,7 +74,8 @@ public class ReservationServiceImpl implements ReservationService {
         restaurantService.checkIfRestaurantExistsById(restaurantId);
 
         List<Reservation> reservations = reservationRepository
-                .findReservationsByRestaurant_RestaurantIdAndStatusOrderByLocalDateAscLocalTimeAsc(restaurantId, status);
+                .findReservationsByRestaurant_RestaurantIdAndStatusOrderByLocalDateAscLocalTimeAsc(
+                        restaurantId, status);
 
         return checkIfReservationListIsNotEmpty(reservations);
     }
@@ -114,7 +115,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     public Reservation save(Long restaurantId, Reservation reservation) {
 
-        if (reservation.getLocalDate().isBefore(LocalDate.now())){
+        if (reservation.getLocalDate().isBefore(LocalDate.now())) {
             throw new InvalidInputValueException();
         }
 
@@ -129,7 +130,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     public Reservation update(Long restaurantId, Reservation reservationToUpdate, int initialPartySize) {
 
-        if (reservationToUpdate.getLocalDate().isBefore(LocalDate.now())){
+        if (reservationToUpdate.getLocalDate().isBefore(LocalDate.now())) {
             throw new InvalidInputValueException();
         }
 
@@ -166,7 +167,8 @@ public class ReservationServiceImpl implements ReservationService {
 
             case CONFIRMED -> {
 
-                checkIfWasUnreadUpdateTimeslotAndReservation(newStatus, restaurant, reservation, currentStatus, partySize);
+                checkIfWasUnreadUpdateTimeslotAndReservation(newStatus, restaurant, reservation,
+                        currentStatus, partySize);
                 emailService.prepareConfirmedEmail(restaurant, reservation);
             }
 
@@ -190,7 +192,9 @@ public class ReservationServiceImpl implements ReservationService {
         return reservationRepository.findByReservationId(reservationId).get();
     }
 
-    private void checkIfWasUnreadUpdateTimeslotAndReservation(ReservationStatuses newStatus, Restaurant restaurant, Reservation reservation, ReservationStatuses currentStatus, Integer partySize) {
+    private void checkIfWasUnreadUpdateTimeslotAndReservation(
+            ReservationStatuses newStatus, Restaurant restaurant, Reservation reservation,
+            ReservationStatuses currentStatus, Integer partySize) {
 
         if (currentStatus == ReservationStatuses.UNREAD) {
             timeslotService.updateTimeslotCapacity(partySize, reservation.getLocalDate(),
@@ -205,7 +209,9 @@ public class ReservationServiceImpl implements ReservationService {
         }
     }
 
-    private void checkIfWasConfirmedUpdateTimeslotAndReservation(ReservationStatuses newStatus, Restaurant restaurant, Reservation reservation, ReservationStatuses currentStatus, Integer partySize) {
+    private void checkIfWasConfirmedUpdateTimeslotAndReservation(
+            ReservationStatuses newStatus, Restaurant restaurant, Reservation reservation,
+            ReservationStatuses currentStatus, Integer partySize) {
 
         if (currentStatus == ReservationStatuses.CONFIRMED) {
             timeslotService.updateTimeslotCapacity(-partySize, reservation.getLocalDate(),
@@ -252,7 +258,7 @@ public class ReservationServiceImpl implements ReservationService {
         }
     }
 
-    private List<Reservation> checkIfReservationListIsNotEmpty(List<Reservation> allReservations) {
+    public List<Reservation> checkIfReservationListIsNotEmpty(List<Reservation> allReservations) {
 
         if (!allReservations.isEmpty()) {
             return allReservations;
@@ -263,7 +269,7 @@ public class ReservationServiceImpl implements ReservationService {
         }
     }
 
-    private Page<Reservation> checkIfPageReservationIsNotEmpty(Page<Reservation> reservationPage) {
+    public Page<Reservation> checkIfPageReservationIsNotEmpty(Page<Reservation> reservationPage) {
 
         if (!reservationPage.isEmpty()) {
             return reservationPage;
@@ -273,5 +279,4 @@ public class ReservationServiceImpl implements ReservationService {
                     .createNotFoundByIdMessage(Page.class, reservationPage.toString()));
         }
     }
-
 }

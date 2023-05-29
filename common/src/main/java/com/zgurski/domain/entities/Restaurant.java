@@ -8,11 +8,8 @@ import lombok.ToString;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -27,15 +24,12 @@ import java.util.Set;
 @Data
 @Entity
 @EqualsAndHashCode(exclude = {
-        "reservations", "defaultWeekDays", "calendarDays", "roles"
+        "reservations", "defaultWeekDays", "calendarDays"
 })
 @ToString(exclude = {
-        "reservations", "defaultWeekDays", "calendarDays", "roles"
+        "reservations", "defaultWeekDays", "calendarDays"
 })
 @Table(name = "restaurants")
-//@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-//@NamedQuery(name = "m_restaurant_multiple_ids_search", query = "select r from Restaurant where r.id = :restaurantIds)
-//@Cacheable
 public class Restaurant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,8 +39,6 @@ public class Restaurant {
     @Column(name = "restaurant_name")
     private String restaurantName;
 
-    //@NotEmpty(message = "Email should be not empty.")
-    //@Email(message = "Email should be valid.")
     @Column(name = "contact_email")
     private String contactEmail;
 
@@ -94,13 +86,6 @@ public class Restaurant {
     @Column(name = "default_timeslot_capacity")
     private Integer defaultTimeslotCapacity;
 
-//    @Embedded
-//    @AttributeOverrides({
-//            @AttributeOverride(name = "emailUserAuth", column = @Column(name = "auth_email")),
-//            @AttributeOverride(name = "passwordUserAuth", column = @Column(name = "auth_password"))
-//    })
-//    private AuthenticationInfo authenticationInfo;
-
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JsonManagedReference
     private Set<Reservation> reservations = Collections.emptySet();
@@ -112,18 +97,6 @@ public class Restaurant {
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JsonManagedReference
     private Set<CalendarDay> calendarDays = Collections.emptySet();
-
-//    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-//    @JsonManagedReference
-//    private Set<BillingDetails> billingDetails = Collections.emptySet();
-
-//    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-//    @JsonManagedReference
-//    private Set<Subscription> subscriptions = Collections.emptySet();
-
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    @JsonManagedReference
-    private Set<Role> roles = Collections.emptySet();
 
     @Override
     public String toString() {

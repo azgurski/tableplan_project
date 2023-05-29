@@ -15,14 +15,16 @@ import java.time.DayOfWeek;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Validated
-@Schema(description = "DefaultDay (Schedule) CreateRequest")
+@Schema(description = "DefaultDay(Schedule) CreateRequest")
 public class DefaultWeekDayCreateRequest {
 
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "MONDAY", type = "DayOfWeek", description = "Day of week")
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "MONDAY", type = "DayOfWeek",
+            description = "Day of week")
     @NotNull
     private DayOfWeek dayOfWeek;
 
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "true", type = "boolean", description = "True, if restaurant is open on this day.")
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "true", type = "boolean",
+            description = "True, if restaurant is open on this day.")
     @NotNull
     private Boolean isOpen;
 }

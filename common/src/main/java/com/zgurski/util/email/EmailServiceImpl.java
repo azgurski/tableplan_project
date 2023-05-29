@@ -19,7 +19,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
 
-
 @Service
 @RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
@@ -77,7 +76,8 @@ public class EmailServiceImpl implements EmailService {
         createEmailContextAndSend(restaurant, reservation, annulationSubject, annulationPath);
     }
 
-    public void createEmailContextAndSend(Restaurant restaurant, Reservation reservation, String subject, String templatePath) {
+    public void createEmailContextAndSend(Restaurant restaurant, Reservation reservation, String subject,
+                                          String templatePath) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(datePattern, Locale.UK);
         String formattedDate = formatter.format(reservation.getLocalDate());
@@ -134,34 +134,4 @@ public class EmailServiceImpl implements EmailService {
             throw new EmailNotSentException(messageGenerator.createEmailNotSentMessage(email.getTo()));
         }
     }
-
-
-//    @Override
-//    public void sendMessageWithAttachment(String to, String subject, String text, String pathToAttachment) {
-//
-//        MimeMessage message = emailSender.createMimeMessage();
-//
-//        try {
-//            MimeMessageHelper helper = new MimeMessageHelper(message, true);
-//
-//            helper.setFrom("noreply@tableplan.fr.com");
-//            helper.setTo(to);
-//            helper.setSubject(subject);
-//            helper.setText(text);
-//
-//            FileSystemResource file
-//                    = new FileSystemResource(new File(pathToAttachment)); //"path/to/file"
-//            helper.addAttachment("Reservation_" +
-////                pnr
-//                    "", file);
-//
-//            emailSender.send(message);
-//
-//        } catch (MessagingException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//
-//    }
-
 }

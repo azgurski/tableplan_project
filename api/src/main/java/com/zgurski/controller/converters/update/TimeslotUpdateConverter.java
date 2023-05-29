@@ -23,7 +23,6 @@ public class TimeslotUpdateConverter extends TimeslotBaseConverter<TimeslotUpdat
     @Override
     public Timeslot convert(TimeslotUpdateRequest request) {
 
-//       TODO active service.checkIfTimeslotExistsById(request.getTimeslotId());
         service.checkIfTimeslotExistsById(request.getTimeslotId());
         Optional<Timeslot> timeslot = repository.findById(request.getTimeslotId());
 

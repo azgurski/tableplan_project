@@ -49,7 +49,7 @@ public class DefaultWeekDayServiceImpl implements DefaultWeekDayService {
         restaurantService.checkIfRestaurantExistsById(restaurantId);
 
         List<DefaultWeekDay> allDefaultWeekDays = weekDayRepository.
-        findDefaultWeekDaysByRestaurant_RestaurantIdOrderByDayOfWeek(restaurantId);
+                findDefaultWeekDaysByRestaurant_RestaurantIdOrderByDayOfWeek(restaurantId);
 
         checkIfDefaultWeekDayListIsNotEmpty(allDefaultWeekDays);
 
@@ -140,7 +140,7 @@ public class DefaultWeekDayServiceImpl implements DefaultWeekDayService {
 
     /* Verifications, custom exceptions */
 
-    private Optional<DefaultWeekDay> checkIfDefaultDayIsPresent(Optional<DefaultWeekDay> defaultWeekDay) {
+    public Optional<DefaultWeekDay> checkIfDefaultDayIsPresent(Optional<DefaultWeekDay> defaultWeekDay) {
         if (defaultWeekDay.isPresent()) {
             return defaultWeekDay;
         } else {
@@ -149,7 +149,8 @@ public class DefaultWeekDayServiceImpl implements DefaultWeekDayService {
         }
     }
 
-    public Boolean checkBelongingDefaultWeekDayToRestaurant(Long restaurantId, Long defaultWeekDayId, DayOfWeek dayOfWeek) {
+    public Boolean checkBelongingDefaultWeekDayToRestaurant(Long restaurantId, Long defaultWeekDayId,
+                                                            DayOfWeek dayOfWeek) {
 
         Optional<DefaultWeekDay> defaultWeekDay = weekDayRepository
                 .findDefaultWeekDayByDefaultWeekDayIdAndRestaurant_RestaurantId(defaultWeekDayId, restaurantId);
@@ -174,7 +175,7 @@ public class DefaultWeekDayServiceImpl implements DefaultWeekDayService {
         }
     }
 
-    private List<DefaultWeekDay> checkIfDefaultWeekDayListIsNotEmpty(List<DefaultWeekDay> allDefaultWeekDays) {
+    public List<DefaultWeekDay> checkIfDefaultWeekDayListIsNotEmpty(List<DefaultWeekDay> allDefaultWeekDays) {
 
         if (!allDefaultWeekDays.isEmpty()) {
             return allDefaultWeekDays;
@@ -185,7 +186,7 @@ public class DefaultWeekDayServiceImpl implements DefaultWeekDayService {
         }
     }
 
-    private Page<DefaultWeekDay> checkIfPageDefaultWeekDayIsNotEmpty(Page<DefaultWeekDay> defaultWeekDayPage) {
+    public Page<DefaultWeekDay> checkIfPageDefaultWeekDayIsNotEmpty(Page<DefaultWeekDay> defaultWeekDayPage) {
 
         if (!defaultWeekDayPage.isEmpty()) {
             return defaultWeekDayPage;
@@ -195,6 +196,4 @@ public class DefaultWeekDayServiceImpl implements DefaultWeekDayService {
                     .createNotFoundByIdMessage(Page.class, defaultWeekDayPage.toString()));
         }
     }
-
-    //TODO exception with weekDay.getDayOfWeekValue
 }

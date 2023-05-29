@@ -67,7 +67,8 @@ public class CalendarDayController {
     public ResponseEntity<EntityModel<CalendarDay>> findOneByDateAndRestaurantId
             (@PathVariable Long restaurantId, @PathVariable int year, @PathVariable int month, @PathVariable int day) {
 
-        CalendarDay calendarDay = calendarDayService.findByDateAndRestaurantId(restaurantId, year, month, day).get();
+        CalendarDay calendarDay = calendarDayService
+                .findByDateAndRestaurantId(restaurantId, year, month, day).get();
         EntityModel<CalendarDay> calendarDayEntityModel = calendarDayAssembler.toModel(calendarDay);
 
         return ResponseEntity.ok(calendarDayEntityModel);
@@ -90,7 +91,8 @@ public class CalendarDayController {
     @GetMapping("/restaurants/{restaurantId}/availability")
     public ResponseEntity<List<EntityModel<CalendarDay>>> findAllForNextSixtyDays(@PathVariable Long restaurantId) {
 
-        List<EntityModel<CalendarDay>> calendarDays = calendarDayService.findAllForNextSixtyDays(restaurantId).stream()
+        List<EntityModel<CalendarDay>> calendarDays = calendarDayService
+                .findAllForNextSixtyDays(restaurantId).stream()
                 .map(calendarDayAssembler::toModel)
                 .collect(Collectors.toList());
 

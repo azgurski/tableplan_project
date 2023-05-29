@@ -14,7 +14,8 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class DefaultWeekDayUpdateConverter extends DefaultWeekDayBaseConverter<DefaultWeekDayUpdateRequest, DefaultWeekDay> {
+public class DefaultWeekDayUpdateConverter extends DefaultWeekDayBaseConverter
+        <DefaultWeekDayUpdateRequest, DefaultWeekDay> {
 
     private final DefaultWeekDayRepository repository;
 
@@ -22,8 +23,6 @@ public class DefaultWeekDayUpdateConverter extends DefaultWeekDayBaseConverter<D
 
     @Override
     public DefaultWeekDay convert(DefaultWeekDayUpdateRequest request) {
-
-        //       TODO check
 
         service.checkIfDefaultWeekDayExistsById(request.getDefaultWeekDayId());
         Optional<DefaultWeekDay> weekDay = repository.findById(request.getDefaultWeekDayId());

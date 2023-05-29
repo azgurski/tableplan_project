@@ -11,7 +11,6 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.validation.constraints.NotNull;
 
-//TODO удалить
 @Setter
 @Getter
 @RequiredArgsConstructor
@@ -20,7 +19,8 @@ import javax.validation.constraints.NotNull;
 public class ReservationSearchCriteria {
 
 
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "NOT_READ", type = "ReservationStatuses", description = "Reservation status")
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "UNREAD", type = "ReservationStatuses",
+            description = "Reservation status")
     @NotNull
     private ReservationStatuses reservationStatus;
 
@@ -29,4 +29,3 @@ public class ReservationSearchCriteria {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
     }
 }
-

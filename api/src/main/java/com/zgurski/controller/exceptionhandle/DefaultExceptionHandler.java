@@ -9,7 +9,6 @@ import com.zgurski.exception.EntityNotFoundException;
 import com.zgurski.exception.FailedTransactionException;
 import com.zgurski.exception.IllegalRequestException;
 import com.zgurski.exception.InvalidInputValueException;
-import com.zgurski.util.CustomErrorMessageGenerator;
 import com.zgurski.util.RandomValuesGenerator;
 import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
@@ -31,7 +30,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import javax.mail.MessagingException;
 import javax.mail.SendFailedException;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
@@ -169,7 +167,6 @@ public class DefaultExceptionHandler {
         ErrorContainer error = buildErrorContainer(ex, 42401, ex.getMessage());
         return new ResponseEntity<>(Collections.singletonMap("error", error), HttpStatus.FAILED_DEPENDENCY);
     }
-
 
 
     @ExceptionHandler(FailedTransactionException.class)

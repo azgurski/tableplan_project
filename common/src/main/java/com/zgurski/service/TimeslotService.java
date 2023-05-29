@@ -34,9 +34,11 @@ public interface TimeslotService {
 
     CalendarDay resetAllTimeslots(Long restaurantId, int year, int month, int day);
 
-    Boolean checkTimeslotCapacity(int incrementPartySize, LocalDate localDate, LocalTime localTime, Restaurant restaurant);
+    Boolean checkTimeslotCapacity(int incrementPartySize, LocalDate localDate, LocalTime localTime,
+                                  Restaurant restaurant);
 
-    Timeslot updateTimeslotCapacity(int incrementPartySize, LocalDate localDate, LocalTime localTime, Restaurant restaurant);
+    Timeslot updateTimeslotCapacity(int incrementPartySize, LocalDate localDate, LocalTime localTime,
+                                    Restaurant restaurant);
 
     CalendarDay setTimeslotsToDefault(Long restaurantId, int year, int month, int day);
 

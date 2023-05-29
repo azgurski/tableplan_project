@@ -14,9 +14,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 @Import(
         {
-        WebMVC.class
-//                ,
-//                HibernateConfig.class
+                WebMVC.class
         }
 )
 @EnableCaching

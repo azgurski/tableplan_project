@@ -9,7 +9,7 @@ public abstract class TimeslotBaseConverter<S, T> implements Converter<S, T> {
     public Timeslot doConvert(Timeslot timeslotForUpdate,
                               TimeslotCreateRequest request) {
 
-        timeslotForUpdate.setLocalTime(request.getLocalTime()); //TODO to check how with PathVariable {YYYY}{}{}
+        timeslotForUpdate.setLocalTime(request.getLocalTime());
         timeslotForUpdate.setMaxSlotCapacity(request.getMaxSlotCapacity());
         timeslotForUpdate.setIsAvailable(request.getIsAvailable());
 

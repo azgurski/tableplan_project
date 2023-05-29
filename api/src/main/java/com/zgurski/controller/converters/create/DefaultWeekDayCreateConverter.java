@@ -11,11 +11,11 @@ import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
-public class DefaultWeekDayCreateConverter extends DefaultWeekDayBaseConverter<DefaultWeekDayCreateRequest, DefaultWeekDay> {
+public class DefaultWeekDayCreateConverter extends
+        DefaultWeekDayBaseConverter<DefaultWeekDayCreateRequest, DefaultWeekDay> {
 
     @Override
     public DefaultWeekDay convert(DefaultWeekDayCreateRequest request) {
-        //       TODO check
 
         DefaultWeekDay weekDay = new DefaultWeekDay();
 

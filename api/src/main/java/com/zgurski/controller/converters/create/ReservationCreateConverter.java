@@ -18,12 +18,9 @@ public class ReservationCreateConverter extends ReservationBaseConverter<Reserva
 
     @Override
     public Reservation convert(ReservationCreateRequest request) {
-        //       TODO check
 
         Reservation reservation = new Reservation();
-
         reservation.setPnr(randomValuesGenerator.generateReservationCode());
-
 
         /* System fields filling */
         reservation.setCreated(Timestamp.valueOf(LocalDateTime.now()));

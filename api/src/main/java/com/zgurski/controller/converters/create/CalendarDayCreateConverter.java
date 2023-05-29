@@ -15,7 +15,6 @@ public class CalendarDayCreateConverter extends CalendarDayBaseConverter<Calenda
 
     @Override
     public CalendarDay convert(CalendarDayCreateRequest request) {
-        //       TODO check
 
         CalendarDay calendarDay = new CalendarDay();
 

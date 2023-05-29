@@ -28,7 +28,7 @@ public class CustomErrorMessageGenerator {
     }
 
     public String createEntityIsUnavailableMessage(Class clazz, LocalDate localDate) {
-        return clazz.getSimpleName() + " is closed on day={" + localDate +"}.";
+        return clazz.getSimpleName() + " is closed on day={" + localDate + "}.";
     }
 
     public String createNoEntityFoundByLocalTimeMessage(Class clazz, LocalTime localTime) {
@@ -51,5 +51,4 @@ public class CustomErrorMessageGenerator {
     public String createImpossibleToUpdateEntity(Class clazz, ReservationStatuses status) {
         return "Impossible to update " + clazz.getSimpleName().toLowerCase() + " with status ={" + status + "}.";
     }
-
 }

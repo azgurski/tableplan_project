@@ -22,7 +22,6 @@ public interface DefaultWeekDayService {
     Optional<DefaultWeekDay> findByDayOfWeekAndRestaurant_RestaurantId(
             DayOfWeek dayOfWeek, Long restaurantId);
 
-
     List<DefaultWeekDay> findScheduleByRestaurantId(Long id);
 
     List<DefaultTime> findAllDefaultTimes();

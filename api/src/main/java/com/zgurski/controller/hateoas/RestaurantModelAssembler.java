@@ -31,8 +31,6 @@ public class RestaurantModelAssembler implements RepresentationModelAssembler<Re
         Link linkReservations = linkTo(methodOn(ReservationController.class)
                 .findAllByRestaurantId(restaurant.getRestaurantId())).withRel("reservations");
 
-        //todo add all reservations today
-
         Link linkAvailabilityToday = linkTo(methodOn(CalendarDayController.class)
                 .findOneByDateAndRestaurantId(restaurant.getRestaurantId(),
                         calendarDate.getYear(), calendarDate.getMonthValue(), calendarDate.getDayOfMonth()))

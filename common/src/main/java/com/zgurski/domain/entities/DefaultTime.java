@@ -25,7 +25,7 @@ import java.util.Set;
 @Data
 @Entity
 @EqualsAndHashCode(exclude = {
-       "defaultWeekDays"
+        "defaultWeekDays"
 })
 @ToString(exclude = {
         "defaultWeekDays"

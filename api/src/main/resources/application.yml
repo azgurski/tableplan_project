@@ -13,13 +13,6 @@ spring:
     url: "jdbc:postgresql://localhost:5432/tableplan_project?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC"
     driver-class-name: org.postgresql.Driver
 
-#  thymeleaf:
-#    cache: true
-#    check-template: true
-#    check-template-location: true
-#    enabled: true
-#    encoding: UTF-8
-
   flyway:
     enabled: true
     baseline-on-migrate: true
@@ -77,10 +70,10 @@ logging:
 
 ---
 
-crud_limit_offset:
-  default_find_all_limit: 20
-  default_find_all_offset: 0
-  default-page-size-by-month: 30
+#crud_limit_offset:
+#  default_find_all_limit: 20
+#  default_find_all_offset: 0
+#  default-page-size-by-month: 30
 
 ---
 
@@ -118,23 +111,4 @@ email:
     recipient-email: "zzgurezz@gmail.com"
     language: "En"
 
-
 ---
-
-
-
-
-
-
-#---
-#
-#jwtconfig:
-#  secret: secret
-#  expiration: 60000
-#  cookieName: tableplan
-#  expirationMs: 86400000
-#  passwordSalt: 142ddefd-5029-4088-90a8-e7bc78d1e0d6
-#
-#---
-
-

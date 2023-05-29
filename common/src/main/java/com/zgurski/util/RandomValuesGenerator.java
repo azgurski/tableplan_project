@@ -8,10 +8,6 @@ import java.util.UUID;
 @Component
 public class RandomValuesGenerator {
 
-    public String generateRandomString() {
-        return RandomStringUtils.random(10, true, true);
-    }
-
     public String generateReservationCode() {
         return RandomStringUtils.random(6, true, true);
     }

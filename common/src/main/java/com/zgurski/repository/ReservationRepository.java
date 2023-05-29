@@ -18,15 +18,16 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
 
     Optional<Reservation> findByReservationId(Long reservationId);
 
-    Optional<Reservation> findReservationByReservationIdAndRestaurant_RestaurantId(Long reservationId, Long restaurantId);
+    Optional<Reservation> findReservationByReservationIdAndRestaurant_RestaurantId(
+            Long reservationId, Long restaurantId);
 
     List<Reservation> findReservationsByRestaurant_RestaurantIdOrderByLocalDateAscLocalTimeAsc(Long restaurantId);
 
     List<Reservation> findReservationsByRestaurant_RestaurantIdAndStatusOrderByLocalDateAscLocalTimeAsc
             (Long restaurantId, ReservationStatuses status);
 
-    @Query(value = "select rsv from Reservation rsv where rsv.localDate = :localDate and rsv.restaurant = :restaurant " +
-            "order by rsv.localDate asc, rsv.localTime asc")
+    @Query(value = "select rsv from Reservation rsv where rsv.localDate = :localDate " +
+            "and rsv.restaurant = :restaurant order by rsv.localDate asc, rsv.localTime asc")
     List<Reservation> findAllByDateAndRestaurant(LocalDate localDate, Restaurant restaurant);
 
 
@@ -44,10 +45,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
     Integer getPartySize(Long reservationId);
 
     @Modifying
-    @Query(value = "update Reservation rsv set rsv.status = :status, rsv.changed = NOW() where rsv.reservationId = :reservationId")
+    @Query(value = "update Reservation rsv set rsv.status = :status, rsv.changed = NOW() " +
+            "where rsv.reservationId = :reservationId")
     void updateStatus(Long reservationId, ReservationStatuses status);
 
     @Modifying
-    @Query(value = "update Reservation rsv set rsv.isDeleted = true, rsv.changed = NOW() where rsv.reservationId = :reservationId")
+    @Query(value = "update Reservation rsv set rsv.isDeleted = true, rsv.changed = NOW() " +
+            "where rsv.reservationId = :reservationId")
     void deleteSoft(Long reservationId);
 }

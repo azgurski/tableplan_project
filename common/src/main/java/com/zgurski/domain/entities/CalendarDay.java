@@ -29,7 +29,6 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Set;
 
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -43,9 +42,6 @@ import java.util.Set;
         "restaurant", "timeslots"
 })
 @Table(name = "calendar_days")
-//@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-//@NamedQuery(name = "m_restaurant_multiple_ids_search", query = "select r from Restaurant where r.id = :restaurantIds)
-//@Cacheable
 public class CalendarDay {
 
     @Id

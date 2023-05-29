@@ -13,7 +13,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
-public class DefaultWeekDayModelAssembler implements RepresentationModelAssembler<DefaultWeekDay, EntityModel<DefaultWeekDay>> {
+public class DefaultWeekDayModelAssembler implements
+        RepresentationModelAssembler<DefaultWeekDay, EntityModel<DefaultWeekDay>> {
 
     @Override
     public EntityModel<DefaultWeekDay> toModel(DefaultWeekDay weekDay) {

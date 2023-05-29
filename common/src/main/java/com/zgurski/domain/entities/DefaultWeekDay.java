@@ -33,8 +33,6 @@ import java.util.Set;
         "restaurant", "defaultTimes"
 })
 @Table(name = "default_week_days")
-//@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-//@NamedQuery(name = "m_restaurant_multiple_ids_search", query = "select r from Restaurant where r.id = :restaurantIds)
 @Cacheable
 public class DefaultWeekDay {
 

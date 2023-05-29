@@ -21,21 +21,13 @@ public class ReservationModelAssembler implements RepresentationModelAssembler<R
 
         Long restaurantId = reservation.getRestaurant().getRestaurantId();
 
-        //TODO заменить в остальных
-        LocalDate todayDate = reservation.getLocalDate();
-
         LocalDate date = reservation.getLocalDate();
         LocalDate nextDate = date.plusDays(1);
         LocalDate previousDate = date.minusDays(1);
 
-
-
-
         Link linkSelf = linkTo(methodOn(ReservationController.class)
                 .findOneById(restaurantId, restaurantId))
                 .withSelfRel();
-
-        //todo change to search by pnr
 
         Link linkReservationsCurrentDay = linkTo(methodOn(ReservationController.class)
                 .findAllByDateAndStatus(restaurantId, ReservationStatuses.CONFIRMED,

@@ -131,7 +131,7 @@ public class TimeslotController {
         return new ResponseEntity<>(Collections.singletonMap("calendarDay", updatedDay), HttpStatus.CREATED);
     }
 
-     /* CRUD */
+    /* CRUD */
 
     @Operation(hidden = true)
     @GetMapping("/timeslots")
@@ -156,7 +156,7 @@ public class TimeslotController {
     @PostMapping("/restaurants/{restaurantId}/availability/{year}/{month}/{day}/timeslots")
     public ResponseEntity<Object> save(
 
-            @PathVariable Long restaurantId,  @Min(value = 2023) @Max(value = 2024) @PathVariable int year,
+            @PathVariable Long restaurantId, @Min(value = 2023) @Max(value = 2024) @PathVariable int year,
             @PathVariable int month, @PathVariable int day, @Valid @RequestBody TimeslotCreateRequest request) {
 
         Timeslot timeslot = conversionService.convert(request, Timeslot.class);

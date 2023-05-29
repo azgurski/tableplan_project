@@ -18,14 +18,8 @@ public abstract class ReservationBaseConverter<S, T> implements Converter<S, T> 
         reservationForUpdate.setGuestNote(request.getGuestNote());
         reservationForUpdate.setGuestLanguage(request.getGuestLanguage());
 
-
-
         /* System fields filling */
-//        reservationForUpdate.setCreated(Timestamp.valueOf(LocalDateTime.now()));
         reservationForUpdate.setIsDeleted(false);
-
-//        /* System fields filling */
-//        reservationForUpdate.setIsDeleted(false);
 
         return reservationForUpdate;
     }

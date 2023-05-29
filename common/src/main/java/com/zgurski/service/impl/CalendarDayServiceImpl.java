@@ -102,9 +102,13 @@ public class CalendarDayServiceImpl implements CalendarDayService {
             throw new InvalidInputValueException();
         }
 
-        if (calendarDayRepository.existsByLocalDateAndRestaurant_RestaurantId(calendarDay.getLocalDate(), restaurantId)) {
+        Boolean isCalendarDayAlreadyExists = calendarDayRepository
+                .existsByLocalDateAndRestaurant_RestaurantId(calendarDay.getLocalDate(), restaurantId);
+
+        if (isCalendarDayAlreadyExists) {
             throw new EntityNotFoundException(messageGenerator
-                    .createNoDuplicatesAllowedByLocalTimeMessage(CalendarDay.class, calendarDay.getLocalDate().toString()));
+                    .createNoDuplicatesAllowedByLocalTimeMessage(CalendarDay.class,
+                            calendarDay.getLocalDate().toString()));
         }
 
         Restaurant restaurant = restaurantService.findById(restaurantId).get();
@@ -123,9 +127,7 @@ public class CalendarDayServiceImpl implements CalendarDayService {
         LocalDate localDate = calendarDay.getLocalDate();
         Restaurant restaurant = restaurantService.findById(restaurantId).get();
 
-//       TODO checkIfCalendarDayExistsById(calendarDayId); в Update конвертере повторяется?
         checkBelongingCalendarDayToRestaurant(restaurantId, calendarDayId, localDate);
-
         calendarDay.setRestaurant(restaurant);
 
         return calendarDayRepository.saveAndFlush(calendarDay);
@@ -139,7 +141,6 @@ public class CalendarDayServiceImpl implements CalendarDayService {
 
         return calendarDayId;
     }
-
 
     /* Verifications */
 
@@ -169,7 +170,8 @@ public class CalendarDayServiceImpl implements CalendarDayService {
         }
     }
 
-    public Optional<CalendarDay> checkIfCalendarDayIsPresentByDay(LocalDate localDate, Optional<CalendarDay> calendarDay) {
+    public Optional<CalendarDay> checkIfCalendarDayIsPresentByDay(LocalDate localDate,
+                                                                  Optional<CalendarDay> calendarDay) {
 
         if (calendarDay.isPresent()) {
             return calendarDay;
@@ -179,7 +181,6 @@ public class CalendarDayServiceImpl implements CalendarDayService {
                     .createNoEntityFoundByLocalDateMessage(CalendarDay.class, localDate));
         }
     }
-
 
 
     public List<CalendarDay> checkIfCalendarDayListIsNotEmpty(List<CalendarDay> allCalendarDays) {

@@ -14,12 +14,13 @@ import java.util.Optional;
 public interface CalendarDayRepository extends JpaRepository<CalendarDay, Long>,
         PagingAndSortingRepository<CalendarDay, Long>, CrudRepository<CalendarDay, Long> {
 
-    @Query(value = "select cd from CalendarDay cd where cd.restaurant.restaurantId = :restaurantId and cd.isOpen = true " +
-            "and extract(month from cd.localDate) = :month and extract(year from cd.localDate) = :year")
+    @Query(value = "select cd from CalendarDay cd where cd.restaurant.restaurantId = :restaurantId " +
+            "and cd.isOpen = true and extract(month from cd.localDate) = :month " +
+            "and extract(year from cd.localDate) = :year")
     List<CalendarDay> findAllOpenDaysByMonth(Long restaurantId, int year, int month);
 
-    @Query(value = "select cd from CalendarDay cd where cd.restaurant.restaurantId = :restaurantId and cd.isOpen = true "
-            + "and cd.localDate >= NOW() and cd.localDate <= (CURRENT_DATE + 60)")
+    @Query(value = "select cd from CalendarDay cd where cd.restaurant.restaurantId = :restaurantId " +
+            "and cd.isOpen = true and cd.localDate >= NOW() and cd.localDate <= (CURRENT_DATE + 60)")
     List<CalendarDay> findAllOpenDaysForNextSixtyDays(Long restaurantId);
 
     Optional<CalendarDay> findById(Long calendarDayId);
@@ -27,10 +28,6 @@ public interface CalendarDayRepository extends JpaRepository<CalendarDay, Long>,
 
     Optional<CalendarDay> findCalendarDayByLocalDateAndRestaurant_RestaurantId
             (LocalDate localDate, Long restaurantId);
-
-    List<CalendarDay> findCalendarDaysByRestaurant_RestaurantIdOrderByLocalDate(Long restaurantId);
-
-
 
     Boolean existsByLocalDateAndRestaurant_RestaurantId(LocalDate localDate, Long restaurantId);
 

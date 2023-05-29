@@ -37,21 +37,14 @@ import java.time.LocalTime;
         "calendarDay"
 })
 @Table(name = "timeslots")
-//@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-//@NamedQuery(name = "m_restaurant_multiple_ids_search", query = "select r from Restaurant where r.id = :restaurantIds)
-//@Cacheable
 public class Timeslot {
 
     @Id
     @GeneratedValue(generator = "timeslotIdGenerator", strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = "timeslotIdGenerator", sequenceName = "enabled_generated_type_sequence", allocationSize = 1)
+    @SequenceGenerator(name = "timeslotIdGenerator", sequenceName = "enabled_generated_type_sequence",
+            allocationSize = 1)
     @Column(name = "timeslot_id")
     private Long timeslotId;
-
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(name = "timeslot_id")
-//    private Long timeslotId;
 
     @Column(name = "local_time")
     @JsonFormat(pattern = "HH:mm")
@@ -78,7 +71,7 @@ public class Timeslot {
     @Column(name = "is_deleted")
     private Boolean isDeleted;
 
-    @ManyToOne(cascade= CascadeType.MERGE)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "calendar_day_id")
     @JsonBackReference
     private CalendarDay calendarDay;
