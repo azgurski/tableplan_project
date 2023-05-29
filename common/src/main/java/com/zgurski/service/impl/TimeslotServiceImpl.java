@@ -217,7 +217,6 @@ public class TimeslotServiceImpl implements TimeslotService {
     }
 
     /* Transfer DefaultDay, DefaultTimes -> CalendarDay, Timeslots */
-
     private void resetCalendarDayTimeslots(LocalDate localDate, Restaurant restaurant, Long restaurantId) {
 
         Optional<CalendarDay> calendarDayOptional = calendarDayRepository
