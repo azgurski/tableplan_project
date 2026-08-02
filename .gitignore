@@ -27,3 +27,6 @@ hs_err_pid*
 *.zip
 *.tar.gz
 *.rar
+
+.env
+.env.local

@@ -32,7 +32,7 @@ public class SwaggerConfig {
 
     private Contact contact() {
         return new Contact()
-                .email("zgurski.andrei@gmail.com")
+                .email("zgursk.it@gmail.com")
                 .name("Andrei Zgurski");
     }
 }

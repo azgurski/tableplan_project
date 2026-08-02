@@ -1,57 +1,36 @@
 spring:
-
-  main:
-    allow-circular-references: true
+  output:
+    ansi:
+      enabled: ALWAYS
 
   datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
     hikari:
-      jdbc-url: "jdbc:postgresql://localhost:5432/tableplan_project?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC"
-      maximum-pool-size: 20
-      driver-class-name: org.postgresql.Driver
-    username: dev
-    password: dev
-    url: "jdbc:postgresql://localhost:5432/tableplan_project?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC"
-    driver-class-name: org.postgresql.Driver
-
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
-    baseline-description: Flyway Scripts
-      #    locations: classpath:/db
-    user: ${spring.datasource.username}
-    password: ${spring.datasource.password}
-    url: ${spring.datasource.url}
-    default-schema: public
-    out-of-order: true
-    ignore-migration-patterns: '*:ignored'
-
-  jpa:
-    show-sql: true
-    properties:
-      hibernate:
-        current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
-        format_sql: false
-        jdbc:
-          batch_size: 5
-        generate_statistics: true
+      maximum-pool-size: ${DB_POOL_SIZE:20}
+      minimum-idle: ${DB_MIN_IDLE:5}
+      connection-timeout: ${DB_CONNECTION_TIMEOUT:30000}
 
   data:
     rest:
       default-page-size: 1
 
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-description: Flyway Scripts
+    default-schema: public
+    out-of-order: true
+    ignore-migration-patterns: "*:ignored"
+
   mail:
-
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls.enable: true
-
-    host: smtp.gmail.com
-    port: 587
-    username: tableplan.info@gmail.com
-    password: fclb ljee gxgq hjyn (incorrect)
-    default-encoding: UTF-8
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
 
   thymeleaf:
     cache: true
@@ -60,36 +39,15 @@ spring:
     enabled: true
     encoding: UTF-8
 
----
-
-logging:
-  level:
-    org.hibernate:
-      engine.jdbc.batch.internal.BatchingBatch: DEBUG
-    root: info
-
----
-
-#crud_limit_offset:
-#  default_find_all_limit: 20
-#  default_find_all_offset: 0
-#  default-page-size-by-month: 30
-
----
-
-year.current: 2023
-year.next: 2024
-
----
+year:
+  current: 2026
+  next: 2027
 
 response.entity.name:
   restaurants: "restaurants"
   reservations: "reservations"
 
----
-
 email:
-
   subject:
     reservation:
       confirmed: "Reservation is confirmed"
@@ -106,9 +64,7 @@ email:
     date: "eeee dd MMMM"
 
   address-details:
-    from: "tableplan.info@gmail.com"
-    to: "zzgurezz@gmail.com"
-    recipient-email: "zzgurezz@gmail.com"
+    from: ${MAIL_FROM}
+    to: ${MAIL_TO}
+    recipient-email: ${MAIL_RECIPIENT}
     language: "En"
-
----
