@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,12 +20,20 @@ public interface CalendarDayRepository extends JpaRepository<CalendarDay, Long>,
             "and extract(year from cd.localDate) = :year")
     List<CalendarDay> findAllOpenDaysByMonth(Long restaurantId, int year, int month);
 
-    @Query(value = "select cd from CalendarDay cd where cd.restaurant.restaurantId = :restaurantId " +
-            "and cd.isOpen = true and cd.localDate >= NOW() and cd.localDate <= (CURRENT_DATE + 60)")
-    List<CalendarDay> findAllOpenDaysForNextSixtyDays(Long restaurantId);
+    @Query(value = """
+                select cd
+                from CalendarDay cd
+                where cd.restaurant.restaurantId = :restaurantId
+                  and cd.isOpen = true
+                  and cd.localDate between :dateFrom and :dateTo
+            """)
+    List<CalendarDay> findAllOpenDaysBetween(
+            @Param("restaurantId") Long restaurantId,
+            @Param("dateFrom") LocalDate dateFrom,
+            @Param("dateTo") LocalDate dateTo
+    );
 
     Optional<CalendarDay> findById(Long calendarDayId);
-
 
     Optional<CalendarDay> findCalendarDayByLocalDateAndRestaurant_RestaurantId
             (LocalDate localDate, Long restaurantId);
@@ -35,6 +44,6 @@ public interface CalendarDayRepository extends JpaRepository<CalendarDay, Long>,
 
     @Modifying
     @Query(value = "update CalendarDay cd set cd.isOpen = false, cd.isDeleted = true, " +
-            "cd.changed = NOW() where cd.calendarDayId = :calendarDayId")
+            "cd.changed = CURRENT_TIMESTAMP where cd.calendarDayId = :calendarDayId")
     void deleteSoft(Long calendarDayId);
 }

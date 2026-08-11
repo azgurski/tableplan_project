@@ -20,7 +20,7 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long>,
     Boolean existsRestaurantByRestaurantId(Long restaurantId);
 
     @Modifying
-    @Query(value = "update Restaurant r set r.isDeleted = true, r.changed = NOW() " +
+    @Query(value = "update Restaurant r set r.isDeleted = true, r.changed = CURRENT_TIMESTAMP " +
             "where r.restaurantId = :restaurantId")
     void deleteSoft(Long restaurantId);
 }

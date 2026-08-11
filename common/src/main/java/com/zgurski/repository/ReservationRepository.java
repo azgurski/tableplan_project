@@ -45,12 +45,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
     Integer getPartySize(Long reservationId);
 
     @Modifying
-    @Query(value = "update Reservation rsv set rsv.status = :status, rsv.changed = NOW() " +
+    @Query(value = "update Reservation rsv set rsv.status = :status, rsv.changed = CURRENT_TIMESTAMP " +
             "where rsv.reservationId = :reservationId")
     void updateStatus(Long reservationId, ReservationStatuses status);
 
     @Modifying
-    @Query(value = "update Reservation rsv set rsv.isDeleted = true, rsv.changed = NOW() " +
+    @Query(value = "update Reservation rsv set rsv.isDeleted = true, rsv.changed = CURRENT_TIMESTAMP " +
             "where rsv.reservationId = :reservationId")
     void deleteSoft(Long reservationId);
 }

@@ -32,7 +32,7 @@ public interface DefaultWeekDayRepository extends JpaRepository<DefaultWeekDay, 
     Boolean existsByDayOfWeekAndRestaurant_RestaurantId(DayOfWeek dayOfWeek, Long restaurantId);
 
     @Modifying
-    @Query(value = "update DefaultWeekDay dwd set dwd.isOpen = false, dwd.isDeleted = true, dwd.changed = NOW() " +
+    @Query(value = "update DefaultWeekDay dwd set dwd.isOpen = false, dwd.isDeleted = true, dwd.changed = CURRENT_TIMESTAMP " +
             "where dwd.defaultWeekDayId = :defaultWeekDayId")
     void deleteSoft(Long defaultWeekDayId);
 }

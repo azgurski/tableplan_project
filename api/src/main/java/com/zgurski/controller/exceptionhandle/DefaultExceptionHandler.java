@@ -1,7 +1,7 @@
 package com.zgurski.controller.exceptionhandle;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.sun.mail.util.MailConnectException;
+import org.eclipse.angus.mail.util.MailConnectException;
 import com.zgurski.exception.EmailNotSentException;
 import com.zgurski.exception.EntityIncorrectOwnerException;
 import com.zgurski.exception.EntityNotAddedException;
@@ -11,7 +11,10 @@ import com.zgurski.exception.IllegalRequestException;
 import com.zgurski.exception.InvalidInputValueException;
 import com.zgurski.util.RandomValuesGenerator;
 import lombok.RequiredArgsConstructor;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -30,8 +33,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import javax.mail.SendFailedException;
-import javax.validation.ConstraintViolationException;
+import jakarta.mail.SendFailedException;
+import jakarta.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.DateTimeException;
@@ -43,7 +46,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DefaultExceptionHandler {
 
-    private static final Logger log = Logger.getLogger(DefaultExceptionHandler.class);
+    private static final Logger log =
+            LoggerFactory.getLogger(DefaultExceptionHandler.class);
 
     private final RandomValuesGenerator generator;
 

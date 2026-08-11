@@ -45,8 +45,14 @@ public class CalendarDayServiceImpl implements CalendarDayService {
 
         restaurantService.checkIfRestaurantExistsById(restaurantId);
 
+        LocalDate today = LocalDate.now();
+
         List<CalendarDay> allCalendarDays = calendarDayRepository.
-                findAllOpenDaysForNextSixtyDays(restaurantId);
+                findAllOpenDaysBetween(
+                        restaurantId,
+                        today,
+                        today.plusDays(60)
+                );
 
         checkIfCalendarDayListIsNotEmpty(allCalendarDays);
 
