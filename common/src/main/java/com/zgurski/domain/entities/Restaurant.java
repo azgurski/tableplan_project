@@ -36,10 +36,10 @@ public class Restaurant {
     @Column(name = "restaurant_id")
     private Long restaurantId;
 
-    @Column(name = "restaurant_name")
+    @Column(name = "restaurant_name", nullable = false, length = 100)
     private String restaurantName;
 
-    @Column(name = "contact_email")
+    @Column(name = "contact_email", nullable = false, length = 200)
     private String contactEmail;
 
     @Column

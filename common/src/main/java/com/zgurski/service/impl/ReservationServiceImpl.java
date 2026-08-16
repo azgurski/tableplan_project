@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -128,6 +129,7 @@ public class ReservationServiceImpl implements ReservationService {
         return reservationRepository.save(reservation);
     }
 
+    @Transactional
     public Reservation update(Long restaurantId, Reservation reservationToUpdate, int initialPartySize) {
 
         if (reservationToUpdate.getLocalDate().isBefore(LocalDate.now())) {
@@ -151,6 +153,7 @@ public class ReservationServiceImpl implements ReservationService {
         return reservationRepository.saveAndFlush(reservationToUpdate);
     }
 
+    @Transactional
     public Reservation updateStatus(Long restaurantId, Long reservationId, ReservationStatuses newStatus) {
 
         Restaurant restaurant = restaurantService.findById(restaurantId).get();
