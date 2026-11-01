@@ -49,7 +49,7 @@ public class TimeslotServiceImpl implements TimeslotService {
 
     public final EntityManager entityManager;
 
-    @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
+    @Value("${spring.jpa.properties.hibernate.jdbc.batch_size:20}")
     private Integer batchSize;
 
     public List<Timeslot> findAll() {

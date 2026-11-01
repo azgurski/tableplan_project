@@ -27,6 +27,7 @@ import jakarta.persistence.Table;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -72,14 +73,10 @@ public class CalendarDay {
     @JsonBackReference
     private Restaurant restaurant;
 
+    @Builder.Default
     @OneToMany(mappedBy = "calendarDay",
             cascade = CascadeType.ALL,
             fetch = FetchType.EAGER, orphanRemoval = true)
     @JsonManagedReference
-    private Set<Timeslot> timeslots = Collections.emptySet();
-
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
-    }
+    private Set<Timeslot> timeslots = new HashSet<>();
 }

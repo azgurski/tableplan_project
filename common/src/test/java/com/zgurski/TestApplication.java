@@ -1,11 +1,19 @@
+//package com.zgurski;
+//
+//import org.springframework.boot.SpringBootConfiguration;
+//import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+//import org.springframework.context.annotation.ComponentScan;
+//
+//@SpringBootConfiguration
+//@EnableAutoConfiguration
+//@ComponentScan(basePackages = "com.zgurski")
+//public class TestApplication {
+//}
+
 package com.zgurski;
 
-import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootConfiguration
-@EnableAutoConfiguration
-@ComponentScan(basePackages = "com.zgurski")
+@SpringBootApplication
 public class TestApplication {
 }

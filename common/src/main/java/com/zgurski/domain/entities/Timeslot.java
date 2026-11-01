@@ -53,6 +53,7 @@ public class Timeslot {
     @Column(name = "is_available")
     private Boolean isAvailable;
 
+    @Builder.Default
     @Column(name = "current_slot_capacity")
     @JsonIgnore
     private Integer currentSlotCapacity = 0;
