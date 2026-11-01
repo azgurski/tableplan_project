@@ -6,7 +6,6 @@ import com.zgurski.domain.enums.ReservationStatuses;
 import com.zgurski.repository.ReservationRepository;
 import com.zgurski.service.RestaurantService;
 import com.zgurski.service.TimeslotService;
-import com.zgurski.service.impl.ReservationServiceImpl;
 import com.zgurski.util.CustomErrorMessageGenerator;
 import com.zgurski.util.email.EmailService;
 import org.junit.jupiter.api.Test;
@@ -57,7 +56,7 @@ class ReservationServiceImplTest {
         reservation.setLocalDate(LocalDate.of(2026, 9, 1));
         reservation.setLocalTime(LocalTime.of(12, 30));
 
-        when(restaurantService.findById(restaurant.getRestaurantId()))
+        when(restaurantService.findByRestaurantId(restaurant.getRestaurantId()))
                 .thenReturn(Optional.of(restaurant));
 
         when(restaurantService.checkIfRestaurantExistsById(restaurant.getRestaurantId()))
@@ -112,7 +111,7 @@ class ReservationServiceImplTest {
         reservation.setLocalDate(LocalDate.of(2026, 9, 1));
         reservation.setLocalTime(LocalTime.of(12, 30));
 
-        when(restaurantService.findById(restaurant.getRestaurantId()))
+        when(restaurantService.findByRestaurantId(restaurant.getRestaurantId()))
                 .thenReturn(Optional.of(restaurant));
 
         when(restaurantService.checkIfRestaurantExistsById(restaurant.getRestaurantId()))
@@ -167,7 +166,7 @@ class ReservationServiceImplTest {
         reservation.setLocalDate(LocalDate.of(2026, 9, 1));
         reservation.setLocalTime(LocalTime.of(12, 30));
 
-        when(restaurantService.findById(restaurant.getRestaurantId()))
+        when(restaurantService.findByRestaurantId(restaurant.getRestaurantId()))
                 .thenReturn(Optional.of(restaurant));
 
         when(restaurantService.checkIfRestaurantExistsById(restaurant.getRestaurantId()))
@@ -228,7 +227,7 @@ class ReservationServiceImplTest {
         reservation.setLocalDate(LocalDate.of(2026, 9, 1));
         reservation.setLocalTime(LocalTime.of(12, 30));
 
-        when(restaurantService.findById(restaurant.getRestaurantId()))
+        when(restaurantService.findByRestaurantId(restaurant.getRestaurantId()))
                 .thenReturn(Optional.of(restaurant));
 
         when(restaurantService.checkIfRestaurantExistsById(restaurant.getRestaurantId()))

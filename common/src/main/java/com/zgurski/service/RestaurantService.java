@@ -13,7 +13,7 @@ public interface RestaurantService {
 
     Page<Restaurant> findAllPageable(Pageable pageable);
 
-    Optional<Restaurant> findById(Long id);
+    Optional<Restaurant> findByRestaurantId(Long id);
 
     Restaurant save(Restaurant restaurant);
 

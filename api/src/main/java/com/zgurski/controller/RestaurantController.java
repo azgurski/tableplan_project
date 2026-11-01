@@ -54,7 +54,7 @@ public class RestaurantController {
     @GetMapping("/{restaurantId}")
     public ResponseEntity<EntityModel<Restaurant>> findOneById(@PathVariable Long restaurantId) {
 
-        Restaurant restaurant = restaurantService.findById(restaurantId).get();
+        Restaurant restaurant = restaurantService.findByRestaurantId(restaurantId).get();
         EntityModel<Restaurant> restaurantEntityModel = restaurantAssembler.toModel(restaurant);
 
         return ResponseEntity.ok(restaurantEntityModel);

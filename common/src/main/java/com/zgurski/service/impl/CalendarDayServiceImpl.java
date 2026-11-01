@@ -117,7 +117,7 @@ public class CalendarDayServiceImpl implements CalendarDayService {
                             calendarDay.getLocalDate().toString()));
         }
 
-        Restaurant restaurant = restaurantService.findById(restaurantId).get();
+        Restaurant restaurant = restaurantService.findByRestaurantId(restaurantId).get();
         calendarDay.setRestaurant(restaurant);
 
         return calendarDayRepository.saveAndFlush(calendarDay);
@@ -131,7 +131,7 @@ public class CalendarDayServiceImpl implements CalendarDayService {
 
         Long calendarDayId = calendarDay.getCalendarDayId();
         LocalDate localDate = calendarDay.getLocalDate();
-        Restaurant restaurant = restaurantService.findById(restaurantId).get();
+        Restaurant restaurant = restaurantService.findByRestaurantId(restaurantId).get();
 
         checkBelongingCalendarDayToRestaurant(restaurantId, calendarDayId, localDate);
         calendarDay.setRestaurant(restaurant);

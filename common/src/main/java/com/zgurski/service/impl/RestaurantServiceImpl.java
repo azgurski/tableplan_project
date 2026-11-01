@@ -33,7 +33,7 @@ public class RestaurantServiceImpl implements RestaurantService {
         return checkIfPageRestaurantNotEmpty(restaurantPage);
     }
 
-    public Optional<Restaurant> findById(Long id) {
+    public Optional<Restaurant> findByRestaurantId(Long id) {
 
         checkIfRestaurantExistsById(id);
         return restaurantRepository.findByRestaurantId(id);

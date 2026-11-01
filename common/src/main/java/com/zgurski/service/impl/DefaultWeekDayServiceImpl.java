@@ -108,7 +108,7 @@ public class DefaultWeekDayServiceImpl implements DefaultWeekDayService {
                             (DefaultWeekDay.class, defaultWeekDay.getDayOfWeek().toString()));
         }
 
-        Restaurant restaurant = restaurantService.findById(restaurantId).get();
+        Restaurant restaurant = restaurantService.findByRestaurantId(restaurantId).get();
         defaultWeekDay.setRestaurant(restaurant);
 
         return weekDayRepository.save(defaultWeekDay);
@@ -118,7 +118,7 @@ public class DefaultWeekDayServiceImpl implements DefaultWeekDayService {
 
         Long defaultWeekDayId = defaultWeekDay.getDefaultWeekDayId();
         DayOfWeek dayOfWeek = defaultWeekDay.getDayOfWeek();
-        Restaurant restaurant = restaurantService.findById(restaurantId).get();
+        Restaurant restaurant = restaurantService.findByRestaurantId(restaurantId).get();
 
         checkIfDefaultWeekDayExistsById(defaultWeekDayId);
         checkBelongingDefaultWeekDayToRestaurant(restaurantId, defaultWeekDayId, dayOfWeek);

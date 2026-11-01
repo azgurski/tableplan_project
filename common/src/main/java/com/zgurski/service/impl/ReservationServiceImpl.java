@@ -83,7 +83,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     public List<Reservation> findAllByDateAndRestaurantId(Long restaurantId, int year, int month, int day) {
 
-        Restaurant restaurant = restaurantService.findById(restaurantId).get();
+        Restaurant restaurant = restaurantService.findByRestaurantId(restaurantId).get();
         LocalDate localDate = LocalDate.of(year, month, day);
 
         return checkIfReservationListIsNotEmpty(
@@ -93,7 +93,7 @@ public class ReservationServiceImpl implements ReservationService {
     public List<Reservation> findAllByDateStatusAndRestaurantId(
             Long restaurantId, ReservationStatuses status, int year, int month, int day) {
 
-        Restaurant restaurant = restaurantService.findById(restaurantId).get();
+        Restaurant restaurant = restaurantService.findByRestaurantId(restaurantId).get();
         LocalDate localDate = LocalDate.of(year, month, day);
 
         return checkIfReservationListIsNotEmpty(
@@ -120,7 +120,7 @@ public class ReservationServiceImpl implements ReservationService {
             throw new InvalidInputValueException();
         }
 
-        Restaurant restaurant = restaurantService.findById(restaurantId).get();
+        Restaurant restaurant = restaurantService.findByRestaurantId(restaurantId).get();
         reservation.setRestaurant(restaurant);
 
         timeslotService.checkTimeslotCapacity(
@@ -136,7 +136,7 @@ public class ReservationServiceImpl implements ReservationService {
             throw new InvalidInputValueException();
         }
 
-        Restaurant restaurant = restaurantService.findById(restaurantId).get();
+        Restaurant restaurant = restaurantService.findByRestaurantId(restaurantId).get();
 
         Integer incrementPartySize = reservationToUpdate.getPartySize() - initialPartySize;
 
@@ -156,7 +156,7 @@ public class ReservationServiceImpl implements ReservationService {
     @Transactional
     public Reservation updateStatus(Long restaurantId, Long reservationId, ReservationStatuses newStatus) {
 
-        Restaurant restaurant = restaurantService.findById(restaurantId).get();
+        Restaurant restaurant = restaurantService.findByRestaurantId(restaurantId).get();
         Reservation reservation = findByReservationIdAndRestaurantId(reservationId, restaurantId).get();
 
         ReservationStatuses currentStatus = reservation.getStatus();

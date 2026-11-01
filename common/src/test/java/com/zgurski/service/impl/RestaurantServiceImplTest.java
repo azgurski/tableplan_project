@@ -3,7 +3,6 @@ package com.zgurski.service.impl;
 import com.zgurski.domain.entities.Restaurant;
 import com.zgurski.exception.EntityNotFoundException;
 import com.zgurski.repository.RestaurantRepository;
-import com.zgurski.service.impl.RestaurantServiceImpl;
 import com.zgurski.util.CustomErrorMessageGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,7 +41,7 @@ class RestaurantServiceImplTest {
         when(restaurantRepository.findByRestaurantId(restaurantId))
                 .thenReturn(Optional.of(restaurant));
 
-        Optional<Restaurant> result = restaurantService.findById(restaurantId);
+        Optional<Restaurant> result = restaurantService.findByRestaurantId(restaurantId);
 
         assertTrue(result.isPresent());
         assertSame(restaurant, result.get());
@@ -63,7 +62,7 @@ class RestaurantServiceImplTest {
 
         assertThrows(
                 EntityNotFoundException.class,
-                () -> restaurantService.findById(restaurantId)
+                () -> restaurantService.findByRestaurantId(restaurantId)
         );
 
         verify(restaurantRepository, never())

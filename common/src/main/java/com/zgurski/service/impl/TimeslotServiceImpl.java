@@ -177,7 +177,7 @@ public class TimeslotServiceImpl implements TimeslotService {
     @Transactional
     public CalendarDay setTimeslotsToDefault(Long restaurantId, int year, int month, int day) {
 
-        Restaurant restaurant = restaurantService.findById(restaurantId).get();
+        Restaurant restaurant = restaurantService.findByRestaurantId(restaurantId).get();
 
         LocalDate localDate = LocalDate.of(year, month, day);
         DayOfWeek dayOfWeek = localDate.getDayOfWeek();
